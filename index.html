@@ -2,202 +2,193 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>光影记忆 · 折叠相册</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>电子照相馆 · 2026时间轴</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none; /* 避免拖动干扰，不影响选中文字 */
         }
 
         body {
-            background: #0a0f1e;  /* 深色电影感背景 */
-            font-family: 'Segoe UI', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
-            padding: 2rem 1rem;
-            color: #eef2ff;
+            background: #fefaf5;   /* 暖白做旧纸质感 */
+            font-family: 'Inter', 'Segoe UI', 'Georgia', 'Times New Roman', serif;
+            overflow: hidden;       /* 隐藏全局滚动条，改用横向滚动 */
+            height: 100vh;
+            width: 100vw;
         }
 
-        /* 主容器 */
-        .album-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* 头部 */
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-            position: relative;
-        }
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid rgba(255,255,255,0.3);
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            margin-bottom: 1rem;
-        }
-        .name {
-            font-size: 2.5rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, #e2e2e2, #b0b3ff);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: 1px;
-        }
-        .bio {
-            color: #9ca3af;
-            margin-top: 0.5rem;
-            font-size: 1rem;
-        }
-
-        /* 横向折叠布局 (Flex 实现手风琴) */
-        .accordion {
+        /* ---- 横向滚动主容器 ---- */
+        .timeline {
             display: flex;
-            flex-wrap: nowrap;
-            gap: 1rem;
             overflow-x: auto;
-            padding: 1rem 0.5rem 2rem 0.5rem;
+            scroll-snap-type: x mandatory;
             scroll-behavior: smooth;
-            cursor: grab;
+            height: 100vh;
+            width: 100%;
             scrollbar-width: thin;
+            scrollbar-color: #b9a89a #f0e6dc;
         }
-        .accordion:active {
-            cursor: grabbing;
+        .timeline::-webkit-scrollbar {
+            height: 6px;
         }
-        /* 每个月份卡片 */
-        .month-card {
-            flex: 0 0 90px;          /* 默认折叠宽度 */
-            background: rgba(20, 28, 40, 0.8);
-            backdrop-filter: blur(4px);
-            border-radius: 28px;
-            transition: flex 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            position: relative;
+        .timeline::-webkit-scrollbar-track {
+            background: #f0e6dc;
+            border-radius: 8px;
         }
-        /* 展开的卡片 */
-        .month-card.expanded {
-            flex: 1 1 400px;
-            cursor: default;
+        .timeline::-webkit-scrollbar-thumb {
+            background: #b9a89a;
+            border-radius: 8px;
         }
 
-        /* 折叠时的标题区域（竖向文字） */
-        .card-header {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            padding: 1rem 0;
-            font-weight: 600;
-            font-size: 1.3rem;
-            letter-spacing: 4px;
-            background: linear-gradient(135deg, #2a3a5e, #1a2638);
-            color: #f0f3fa;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            transition: all 0.2s;
-        }
-        .month-card.expanded .card-header {
-            writing-mode: horizontal-tb;
-            padding: 1rem 1.5rem;
-            justify-content: flex-start;
-            font-size: 1.5rem;
-            background: rgba(40, 55, 80, 0.9);
-            border-bottom: 2px solid #ffd966;
-        }
-
-        /* 展开后的内容区域 */
-        .card-content {
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease 0.1s, visibility 0.3s;
-            padding: 0 1rem 1rem 1rem;
+        /* 每个月份为一屏 */
+        .month-panel {
+            flex: 0 0 100vw;
+            scroll-snap-align: start;
             overflow-y: auto;
-            max-height: 65vh;
-        }
-        .month-card.expanded .card-content {
-            opacity: 1;
-            visibility: visible;
+            padding: 2rem 3rem;
+            position: relative;
+            background: #fefaf5;
+            transition: background 0.2s;
         }
 
-        /* 照片网格 */
+        /* 月份标题区 - 艺术感 */
+        .month-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e2dcd5;
+            padding-bottom: 1rem;
+        }
+        .month-name {
+            font-size: 3.5rem;
+            font-weight: 400;
+            letter-spacing: 6px;
+            color: #2b2a28;
+            font-family: 'Times New Roman', serif;
+            text-transform: uppercase;
+        }
+        .year-sub {
+            font-size: 0.9rem;
+            color: #9e8f83;
+            margin-top: 0.25rem;
+            letter-spacing: 2px;
+        }
+
+        /* 照片网格 - 类似胶片陈列 */
         .photo-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.8rem;
             margin-top: 1rem;
+            margin-bottom: 2rem;
         }
-        .photo-item {
-            background: rgba(0,0,0,0.4);
-            border-radius: 16px;
+
+        .photo-card {
+            background: #ffffffd9;
+            border-radius: 20px;
             overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 12px 22px -12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.25s ease, box-shadow 0.25s;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            backdrop-filter: blur(2px);
+            border: 1px solid #f3ede7;
         }
-        .photo-item:hover {
-            transform: scale(1.02);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.4);
+        .photo-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.2);
         }
         .photo-img {
             width: 100%;
-            aspect-ratio: 4/3;
+            aspect-ratio: 4 / 3;
             object-fit: cover;
             display: block;
+            transition: scale 0.3s;
         }
         .photo-caption {
-            padding: 8px;
-            font-size: 0.75rem;
+            padding: 0.8rem;
+            font-size: 0.85rem;
             text-align: center;
-            background: rgba(0,0,0,0.6);
-            color: #ddd;
-            font-weight: 400;
+            color: #4a3f37;
+            background: white;
+            font-family: system-ui;
+            border-top: 1px solid #f3ede7;
         }
 
-        .empty-hint {
+        /* 空月份诗意占位 */
+        .empty-month {
             text-align: center;
-            padding: 2rem;
-            color: #aaa;
+            padding: 4rem 2rem;
+            background: rgba(245, 240, 235, 0.7);
+            border-radius: 48px;
+            color: #b9a89a;
             font-style: italic;
+            font-size: 1.2rem;
         }
 
-        /* 模态框 (大图预览) */
-        .modal {
+        /* 左侧/右侧导航装饰箭头 (简易悬浮) */
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            background: rgba(190, 170, 150, 0.3);
+            backdrop-filter: blur(4px);
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #5c4b3a;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.2s;
+            font-weight: 300;
+            border: none;
+        }
+        .nav-arrow:hover {
+            background: rgba(140, 110, 90, 0.6);
+            color: white;
+        }
+        .nav-left {
+            left: 20px;
+        }
+        .nav-right {
+            right: 20px;
+        }
+
+        /* 全屏模态框 (大图预览) */
+        .modal-overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.92);
-            z-index: 2000;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(8px);
             cursor: pointer;
         }
-        .modal-img {
-            max-width: 85%;
-            max-height: 85%;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        .modal-content {
+            max-width: 85vw;
+            max-height: 85vh;
+            border-radius: 28px;
+            box-shadow: 0 30px 40px rgba(0,0,0,0.4);
         }
         .modal-caption {
+            text-align: center;
+            color: #eee;
             margin-top: 1rem;
-            color: white;
-            background: rgba(0,0,0,0.6);
-            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            background: rgba(0,0,0,0.5);
+            padding: 0.4rem 1.2rem;
             border-radius: 40px;
-            font-size: 0.9rem;
+            display: inline-block;
         }
         .close-modal {
             position: absolute;
@@ -205,7 +196,7 @@
             right: 40px;
             font-size: 2rem;
             color: white;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
             width: 48px;
             height: 48px;
             border-radius: 50%;
@@ -216,215 +207,278 @@
             transition: 0.2s;
         }
         .close-modal:hover {
-            background: #ef4444;
+            background: #b05133;
         }
 
-        /* 滚动条美化 */
-        .accordion::-webkit-scrollbar {
-            height: 6px;
+        /* 底部时间轴小圆点 (指示器) */
+        .dot-indicators {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 15;
         }
-        .accordion::-webkit-scrollbar-track {
-            background: #1f2937;
-            border-radius: 10px;
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #d1c2b4;
+            border-radius: 50%;
+            transition: all 0.2s;
+            cursor: pointer;
         }
-        .accordion::-webkit-scrollbar-thumb {
-            background: #4b5563;
-            border-radius: 10px;
+        .dot.active {
+            width: 28px;
+            background: #9e7f64;
+            border-radius: 12px;
         }
 
-        @media (max-width: 800px) {
+        /* 响应式微调 */
+        @media (max-width: 760px) {
+            .month-panel {
+                padding: 1.5rem;
+            }
+            .month-name {
+                font-size: 2.2rem;
+            }
             .photo-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1rem;
             }
-            .month-card.expanded {
-                flex: 1 1 300px;
-            }
-            .card-header {
-                font-size: 1rem;
+            .nav-arrow {
+                width: 36px;
+                height: 36px;
+                font-size: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-<div class="album-container">
-    <div class="header">
-        <img class="avatar" src="https://picsum.photos/id/64/200/200" alt="头像" onerror="this.src='https://picsum.photos/200/200?random=1'">
-        <h1 class="name">小和的时光相册</h1>
-        <p class="bio">光影记忆 · 每一帧都是故事</p>
-    </div>
 
-    <!-- 横向折叠区域 -->
-    <div class="accordion" id="accordion"></div>
+<!-- 左右导航箭头 -->
+<button class="nav-arrow nav-left" id="prevBtn">←</button>
+<button class="nav-arrow nav-right" id="nextBtn">→</button>
+<!-- 底部月份指示器 -->
+<div class="dot-indicators" id="dotContainer"></div>
+
+<!-- 主时间轴容器 -->
+<div class="timeline" id="timeline">
+    <!-- 月份面板将由 JS 动态生成，便于管理和数据替换 -->
 </div>
 
 <!-- 模态框 -->
-<div id="modal" class="modal">
+<div id="photoModal" class="modal-overlay">
     <span class="close-modal">&times;</span>
     <div style="display: flex; flex-direction: column; align-items: center;">
-        <img class="modal-img" id="modalImage">
+        <img class="modal-content" id="modalImg" alt="大图">
         <div id="modalCaption" class="modal-caption"></div>
     </div>
 </div>
 
 <script>
-    // ---------- 照片数据（2026年，按月分组）----------
-    const photos = [
-        { year: 2026, month: 1, url: "https://picsum.photos/id/13/400/300", caption: "元旦的日出" },
-        { year: 2026, month: 1, url: "https://picsum.photos/id/15/400/300", caption: "森林雪景" },
-        { year: 2026, month: 2, url: "https://picsum.photos/id/20/400/300", caption: "情人节礼物" },
-        { year: 2026, month: 2, url: "https://picsum.photos/id/26/400/300", caption: "春节烟花" },
-        { year: 2026, month: 2, url: "https://picsum.photos/id/28/400/300", caption: "团圆饭" },
-        { year: 2026, month: 3, url: "https://picsum.photos/id/96/400/300", caption: "樱花盛开" },
-        { year: 2026, month: 5, url: "https://picsum.photos/id/169/400/300", caption: "劳动节郊游" },
-        { year: 2026, month: 5, url: "https://picsum.photos/id/42/400/300", caption: "海边露营" },
-        { year: 2026, month: 6, url: "https://picsum.photos/id/30/400/300", caption: "儿童节气球" },
-        { year: 2026, month: 7, url: "https://picsum.photos/id/59/400/300", caption: "夏日冰淇淋" },
-        { year: 2026, month: 8, url: "https://picsum.photos/id/47/400/300", caption: "登山望远" },
-        { year: 2026, month: 9, url: "https://picsum.photos/id/34/400/300", caption: "开学季" },
-        { year: 2026, month: 10, url: "https://picsum.photos/id/29/400/300", caption: "国庆灯笼" },
-        { year: 2026, month: 11, url: "https://picsum.photos/id/64/400/300", caption: "银杏叶" },
-        { year: 2026, month: 12, url: "https://picsum.photos/id/91/400/300", caption: "圣诞派对" },
-        { year: 2026, month: 12, url: "https://picsum.photos/id/100/400/300", caption: "跨年倒计时" }
+    // ============================================================
+    // 📷📷📷【照片数据区域】请在这里替换您自己的照片链接 ==========
+    // ============================================================
+    // 格式: { month: 1~12, url: "图片地址", caption: "照片描述" }
+    // 您可以根据需要增加或删除照片，月份会自动生成面板。
+    // 所有图片建议使用真实可访问的URL（可以放在images文件夹内，比如 "images/jan/01.jpg"）
+    // 示例数据包含占位图（LoremFlick / picsum），替换时保留此结构。
+    const photosData = [
+        // 一月 (January)
+        { month: 1, url: "https://picsum.photos/id/13/500/400", caption: "新年初雪 · 静谧庭院" },
+        { month: 1, url: "https://picsum.photos/id/15/500/400", caption: "晨雾森林" },
+        // 二月
+        { month: 2, url: "https://picsum.photos/id/20/500/400", caption: "情人节的手写信" },
+        { month: 2, url: "https://picsum.photos/id/26/500/400", caption: "春节烟花漫舞" },
+        { month: 2, url: "https://picsum.photos/id/28/500/400", caption: "围炉夜话" },
+        // 三月
+        { month: 3, url: "https://picsum.photos/id/96/500/400", caption: "樱花隧道" },
+        // 四月 (无示例照片 → 会显示诗意占位)
+        // 五月
+        { month: 5, url: "https://picsum.photos/id/169/500/400", caption: "劳动节远足" },
+        { month: 5, url: "https://picsum.photos/id/42/500/400", caption: "海边营地" },
+        // 六月
+        { month: 6, url: "https://picsum.photos/id/30/500/400", caption: "儿童节气球派对" },
+        // 七月
+        { month: 7, url: "https://picsum.photos/id/59/500/400", caption: "盛夏冰淇淋车" },
+        // 八月
+        { month: 8, url: "https://picsum.photos/id/47/500/400", caption: "高山徒步" },
+        // 九月
+        { month: 9, url: "https://picsum.photos/id/34/500/400", caption: "开学季书店" },
+        // 十月
+        { month: 10, url: "https://picsum.photos/id/29/500/400", caption: "银杏叶落" },
+        // 十一月
+        { month: 11, url: "https://picsum.photos/id/64/500/400", caption: "咖啡暖意" },
+        // 十二月
+        { month: 12, url: "https://picsum.photos/id/91/500/400", caption: "圣诞树影" },
+        { month: 12, url: "https://picsum.photos/id/100/500/400", caption: "跨年倒计时" }
     ];
 
+    // ---------- 辅助数据 ----------
     const monthNames = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
-
-    // 按月份分组 (1~12)
-    function groupByMonth(photoArray) {
+    
+    // 按月份整理照片 (1~12)
+    function groupPhotosByMonth() {
         const groups = {};
         for (let i = 1; i <= 12; i++) groups[i] = [];
-        photoArray.forEach(p => {
-            if (p.year === 2026 && p.month >= 1 && p.month <= 12) {
-                groups[p.month].push(p);
+        photosData.forEach(photo => {
+            if (photo.month >= 1 && photo.month <= 12) {
+                groups[photo.month].push(photo);
             }
         });
         return groups;
     }
 
+    // 创建单个月份面板的DOM
+    function createMonthPanel(month, photosList) {
+        const panel = document.createElement('div');
+        panel.className = 'month-panel';
+        panel.dataset.month = month;
+
+        // 标题区
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'month-header';
+        headerDiv.innerHTML = `
+            <div class="month-name">${monthNames[month-1]}</div>
+            <div class="year-sub">2026 · ${month} / 12</div>
+        `;
+        panel.appendChild(headerDiv);
+
+        // 内容区（照片网格或空状态）
+        const contentDiv = document.createElement('div');
+        if (photosList.length === 0) {
+            contentDiv.className = 'empty-month';
+            contentDiv.innerText = '✨ 此刻静默 · 等待光影 ✨';
+        } else {
+            const grid = document.createElement('div');
+            grid.className = 'photo-grid';
+            photosList.forEach(photo => {
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                const img = document.createElement('img');
+                img.src = photo.url;
+                img.alt = photo.caption;
+                img.className = 'photo-img';
+                img.loading = 'lazy';
+                const captionSpan = document.createElement('div');
+                captionSpan.className = 'photo-caption';
+                captionSpan.innerText = photo.caption;
+                card.appendChild(img);
+                card.appendChild(captionSpan);
+                // 点击照片放大预览
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openModal(photo.url, photo.caption);
+                });
+                grid.appendChild(card);
+            });
+            contentDiv.appendChild(grid);
+        }
+        panel.appendChild(contentDiv);
+        return panel;
+    }
+
+    // 全局变量
+    let currentMonthIndex = 0;      // 0-based 月份索引 (0=一月)
+    const timeline = document.getElementById('timeline');
+    let panels = [];        // 存储所有月份panel元素
+    let dots = [];          // 存储小圆点元素
+
+    // 更新指示器高亮
+    function updateIndicators(activeIndex) {
+        dots.forEach((dot, idx) => {
+            if (idx === activeIndex) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
+    }
+
+    // 滚动到指定月份（平滑）
+    function scrollToMonth(index) {
+        if (!panels[index]) return;
+        panels[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+        currentMonthIndex = index;
+        updateIndicators(currentMonthIndex);
+    }
+
+    // 监听滚动结束，更新当前月份和指示器
+    function bindScrollObserver() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.target.classList.contains('month-panel')) {
+                    const idx = panels.findIndex(p => p === entry.target);
+                    if (idx !== -1) {
+                        currentMonthIndex = idx;
+                        updateIndicators(currentMonthIndex);
+                    }
+                }
+            });
+        }, { threshold: 0.6 }); // 超过60%可见时切换
+        panels.forEach(panel => observer.observe(panel));
+    }
+
     // 模态框逻辑
-    const modal = document.getElementById('modal');
-    const modalImage = document.getElementById('modalImage');
-    const modalCaptionDiv = document.getElementById('modalCaption');
+    const modal = document.getElementById('photoModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalCaptionSpan = document.getElementById('modalCaption');
     const closeModalBtn = document.querySelector('.close-modal');
     function openModal(imgUrl, caption) {
         modal.style.display = 'flex';
-        modalImage.src = imgUrl;
-        modalCaptionDiv.textContent = caption || '';
+        modalImg.src = imgUrl;
+        modalCaptionSpan.innerText = caption || '';
     }
-    function closeModal() {
+    function closeModalFunc() {
         modal.style.display = 'none';
     }
-    closeModalBtn.addEventListener('click', closeModal);
+    closeModalBtn.addEventListener('click', closeModalFunc);
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
+        if (e.target === modal) closeModalFunc();
     });
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.style.display === 'flex') closeModal();
+        if (e.key === 'Escape' && modal.style.display === 'flex') closeModalFunc();
     });
 
-    // 生成月份卡片
-    function buildAccordion() {
-        const groups = groupByMonth(photos);
-        const container = document.getElementById('accordion');
-        container.innerHTML = '';
-
+    // 构建整个时间轴
+    function buildGallery() {
+        const groups = groupPhotosByMonth();
+        timeline.innerHTML = '';
+        panels = [];
+        // 按月顺序1-12生成
         for (let month = 1; month <= 12; month++) {
-            const monthPhotos = groups[month] || [];
-            const card = document.createElement('div');
-            card.className = 'month-card';
-            card.dataset.month = month;
-
-            // 头部（折叠时显示月份）
-            const header = document.createElement('div');
-            header.className = 'card-header';
-            header.textContent = monthNames[month-1];
-            card.appendChild(header);
-
-            // 内容区域（展开后）
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'card-content';
-
-            if (monthPhotos.length === 0) {
-                contentDiv.innerHTML = `<div class="empty-hint">✨ 这个月暂无照片，等你去记录～</div>`;
-            } else {
-                const grid = document.createElement('div');
-                grid.className = 'photo-grid';
-                monthPhotos.forEach(photo => {
-                    const item = document.createElement('div');
-                    item.className = 'photo-item';
-                    const img = document.createElement('img');
-                    img.src = photo.url;
-                    img.alt = photo.caption;
-                    img.className = 'photo-img';
-                    img.loading = 'lazy';
-                    const captionDiv = document.createElement('div');
-                    captionDiv.className = 'photo-caption';
-                    captionDiv.textContent = photo.caption || '无标题';
-                    item.appendChild(img);
-                    item.appendChild(captionDiv);
-                    item.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        openModal(photo.url, photo.caption);
-                    });
-                    grid.appendChild(item);
-                });
-                contentDiv.appendChild(grid);
-            }
-            card.appendChild(contentDiv);
-
-            // 点击卡片切换展开/折叠
-            card.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // 如果点击的是照片项内部的元素，不切换卡片状态（已阻止冒泡，但安全起见）
-                if (e.target.closest('.photo-item')) return;
-                const isExpanded = card.classList.contains('expanded');
-                if (!isExpanded) {
-                    // 折叠其他所有卡片
-                    document.querySelectorAll('.month-card').forEach(c => c.classList.remove('expanded'));
-                    card.classList.add('expanded');
-                    // 平滑滚动到当前卡片
-                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                } else {
-                    // 如果已经展开，点击折叠（可选，也可以保持展开再点击折叠）
-                    card.classList.remove('expanded');
-                }
-            });
-            container.appendChild(card);
+            const monthPhotos = groups[month];
+            const panel = createMonthPanel(month, monthPhotos);
+            timeline.appendChild(panel);
+            panels.push(panel);
         }
-        // 默认展开第一个有照片的月份（让效果更明显）
-        const firstNonEmpty = Array.from(document.querySelectorAll('.month-card')).find(card => {
-            const month = parseInt(card.dataset.month);
-            return groups[month] && groups[month].length > 0;
-        });
-        if (firstNonEmpty) {
-            firstNonEmpty.classList.add('expanded');
-            setTimeout(() => {
-                firstNonEmpty.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }, 100);
+
+        // 生成底部小圆点
+        const dotContainer = document.getElementById('dotContainer');
+        dotContainer.innerHTML = '';
+        dots = [];
+        for (let i = 0; i < 12; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.addEventListener('click', () => scrollToMonth(i));
+            dotContainer.appendChild(dot);
+            dots.push(dot);
         }
+        // 默认高亮第一个月份
+        updateIndicators(0);
+        // 监听滚动以同步dots
+        bindScrollObserver();
     }
 
-    buildAccordion();
+    // 左右箭头事件
+    document.getElementById('prevBtn').addEventListener('click', () => {
+        if (currentMonthIndex > 0) scrollToMonth(currentMonthIndex - 1);
+    });
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        if (currentMonthIndex < 11) scrollToMonth(currentMonthIndex + 1);
+    });
 
-    // 可选：添加拖动滚动效果（提升交互）
-    const accordion = document.getElementById('accordion');
-    let isDown = false;
-    let startX;
-    let scrollLeft;
-    accordion.addEventListener('mousedown', (e) => {
-        isDown = true;
-        startX = e.pageX - accordion.offsetLeft;
-        scrollLeft = accordion.scrollLeft;
-    });
-    accordion.addEventListener('mouseleave', () => { isDown = false; });
-    accordion.addEventListener('mouseup', () => { isDown = false; });
-    accordion.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - accordion.offsetLeft;
-        const walk = (x - startX) * 1.5;
-        accordion.scrollLeft = scrollLeft - walk;
-    });
+    // 启动
+    buildGallery();
 </script>
 </body>
 </html>
