@@ -1,1086 +1,536 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>禾禾的成长日记</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@300;400;500&family=Source+Code+Pro:wght@400&display=swap" rel="stylesheet">
-  <style>
-    /* ============================================================
-       2026 电子照相馆 - 单文件版本
-       所有样式和逻辑均内联在本文件中
-       
-       【照片替换指南】
-       搜索 "PHOTO_REPLACE" 即可找到所有照片路径配置位置
-       ============================================================ */
-    
-    :root {
-      --color-void: #0a0a0b;
-      --color-amber: #f25b29;
-      --color-metal-light: #e6e7e9;
-      --color-metal-mid: #b0b2b5;
-      --color-metal-dark: #7a7c7f;
-      --font-serif: 'Instrument Serif', Georgia, serif;
-      --font-sans: 'Inter', system-ui, sans-serif;
-      --font-mono: 'Source Code Pro', monospace;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>平面照相馆 · 2026月度影集</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #f5f2ef;  /* 高级暖灰，类似纸张质感 */
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            color: #2c2a28;
+        }
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: var(--color-void);
-      color: #fff;
-      font-family: var(--font-sans);
-      font-weight: 300;
-      -webkit-font-smoothing: antialiased;
-    }
+        /* 主容器 */
+        .archive {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
 
-    /* ============================
-       3D Room Gallery
-       ============================ */
-    .archive-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      perspective: 2000px;
-      overflow: hidden;
-      background: var(--color-void);
-    }
+        /* 头部 */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid #e2ddd6;
+            padding-bottom: 1.5rem;
+        }
+        .header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 400;
+            letter-spacing: 4px;
+            color: #3a3530;
+        }
+        .header p {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: #9b8f82;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+        }
 
-    .archive-scroller {
-      width: 100%;
-      height: 100%;
-      transform-style: preserve-3d;
-      transition: transform 0.2s ease-out;
-    }
+        /* 顶部导航栏（月份指示 + 菜单） */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .month-indicator {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: #b8a281;
+            letter-spacing: 2px;
+        }
+        .month-indicator span {
+            font-size: 1.8rem;
+            color: #2c2a28;
+            font-weight: 600;
+        }
+        .menu-btn {
+            background: none;
+            border: 1px solid #ddd5cc;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #5c554b;
+            border-radius: 30px;
+        }
+        .menu-btn:hover {
+            background: #2c2a28;
+            border-color: #2c2a28;
+            color: white;
+        }
 
-    .room {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100vw;
-      height: 100vh;
-      margin: -50vh 0 0 -50vw;
-      pointer-events: none;
-      opacity: 0;
-      transform-style: preserve-3d;
-      transition: opacity 0.3s ease;
-    }
+        /* 主照片区域（视觉中心） */
+        .hero {
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+            margin-bottom: 2rem;
+            border: 1px solid #eae4dc;
+        }
+        .hero-img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            display: block;
+        }
+        .hero-caption {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-top: 1px solid #f0ebe4;
+            font-size: 0.8rem;
+            color: #7f766b;
+        }
+        .hero-caption-left {
+            display: flex;
+            gap: 1rem;
+            align-items: baseline;
+        }
+        .hero-month {
+            font-weight: 600;
+            color: #b8a281;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+        .hero-desc {
+            font-size: 0.75rem;
+        }
 
-    .room--current {
-      pointer-events: auto;
-      opacity: 1;
-    }
+        /* 月份时间轴（横向滑动） */
+        .timeline {
+            margin: 2rem 0;
+        }
+        .timeline-label {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: #b8a281;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+        .months-scroll {
+            display: flex;
+            gap: 0.6rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            scrollbar-width: thin;
+        }
+        .month-pill {
+            flex: 0 0 70px;
+            text-align: center;
+            padding: 0.6rem 0;
+            background: #ffffff;
+            border: 1px solid #e8e0d8;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 40px;
+        }
+        .month-pill.active {
+            background: #2c2a28;
+            border-color: #2c2a28;
+            color: white;
+        }
+        .month-pill .num {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .month-pill .name {
+            font-size: 0.65rem;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+        .month-pill.active .name {
+            opacity: 1;
+        }
+        .month-pill:hover {
+            border-color: #b8a281;
+            transform: translateY(-2px);
+        }
 
-    .room__side {
-      position: absolute;
-      display: flex;
-      align-items: center;
-    }
+        /* 导航箭头 */
+        .nav-arrows {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .arrow {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid #e2d9d0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1.2rem;
+            color: #5c554b;
+        }
+        .arrow:hover {
+            background: #2c2a28;
+            border-color: #2c2a28;
+            color: white;
+        }
 
-    .room__side--back {
-      width: 100vw;
-      height: 100vh;
-      transform: translate3d(0, 0, -4000px) rotate3d(1, 0, 0, 0.1deg);
-      justify-content: center;
-    }
+        /* 底部信息 */
+        .footer-note {
+            text-align: center;
+            margin-top: 3rem;
+            font-size: 0.7rem;
+            color: #b1a79b;
+            letter-spacing: 1px;
+            border-top: 1px solid #e8e2db;
+            padding-top: 2rem;
+        }
 
-    .room__side--right {
-      width: 4000px;
-      height: 100vh;
-      right: 0;
-      justify-content: flex-end;
-      transform: rotate3d(0, 1, 0, -90.03deg);
-      transform-origin: 100% 50%;
-    }
+        /* 全屏目录（黑色画布） */
+        .fullscreen-dir {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fefaf7;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Cormorant Garamond', serif;
+        }
+        .dir-container {
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+        .dir-header {
+            font-size: 2.5rem;
+            letter-spacing: 4px;
+            color: #3a3530;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e2ddd6;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+        .dir-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 1rem;
+        }
+        .dir-item {
+            background: white;
+            border: 1px solid #e2d9d0;
+            padding: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .dir-item:hover {
+            background: #2c2a28;
+            border-color: #2c2a28;
+            color: white;
+        }
+        .dir-item .cn {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        .dir-item .en {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #9b8f82;
+            margin-top: 4px;
+        }
+        .dir-item:hover .en {
+            color: #ccc;
+        }
+        .close-dir {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #7f766b;
+        }
+        .close-dir:hover {
+            color: #000;
+        }
 
-    .room__side--left {
-      width: 4000px;
-      height: 100vh;
-      left: 0;
-      justify-content: flex-start;
-      transform: rotate3d(0, 1, 0, 90deg);
-      transform-origin: 0 50%;
-    }
+        /* 音乐按钮 */
+        .music-player {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255,255,240,0.9);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            font-size: 1.2rem;
+            border: 1px solid #e2d9d0;
+            color: #5c554b;
+        }
+        .music-player.playing {
+            background: #2c2a28;
+            color: #f0e6d2;
+            border-color: #2c2a28;
+        }
 
-    .room__side--top {
-      width: 100vw;
-      height: 4000px;
-      bottom: 100%;
-      transform: rotate3d(1, 0, 0, -90deg) translate3d(0, 4000px, 0);
-      transform-origin: 50% 100%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.1) 100%);
-      border-bottom: 1.5px solid rgba(0,0,0,0.2);
-    }
-
-    .room__side--bottom {
-      width: 100vw;
-      height: 4000px;
-      top: 100%;
-      transform: rotate3d(1, 0, 0, 90deg) translate3d(0, -4000px, 0);
-      transform-origin: 50% 0%;
-      background: rgba(0,0,0,0.3);
-    }
-
-    .room__side img {
-      max-width: 40%;
-      max-height: 60%;
-      transform: translate3d(0, 0, 10px);
-      backface-visibility: hidden;
-      object-fit: cover;
-      border-radius: 4px;
-    }
-
-    .room__side--back img { margin: 0 5%; }
-    .room__side--left img { margin: 0 0 0 25%; }
-    .room__side--right img { margin: 0 25% 0 0; }
-
-    /* Wall edge lines */
-    .room__side--back {
-      border: 2px solid rgba(0,0,0,0.3);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
-    }
-    .room__side--left, .room__side--right {
-      border-right: 2px solid rgba(0,0,0,0.3);
-      border-top: 2px solid rgba(0,0,0,0.25);
-      border-bottom: 2px solid rgba(0,0,0,0.2);
-    }
-
-    /* Room wall colors */
-    .room--waves .room__side { background: #8b2525; }
-    .room--waves .room__side--bottom { background: #6b1d1d; }
-    .room--monk .room__side { background: #d5d0c8; }
-    .room--monk .room__side--bottom { background: #b5b0a8; }
-    .room--lighthouse .room__side { background: #1a3a5c; }
-    .room--lighthouse .room__side--bottom { background: #142d48; }
-    .room--orlando .room__side { background: #c8a82e; }
-    .room--orlando .room__side--bottom { background: #a88a20; }
-
-    /* Photo placeholder when image fails */
-    .photo-placeholder {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
-      border: 2px dashed rgba(255,255,255,0.1);
-      border-radius: 4px;
-      color: rgba(255,255,255,0.4);
-      font-family: var(--font-sans);
-      font-size: 14px;
-      letter-spacing: 0.1em;
-      text-align: center;
-    }
-
-    /* ============================
-       Content Overlay
-       ============================ */
-    .archive-content {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 100%;
-      z-index: 5;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      padding-bottom: 12vh;
-    }
-
-    .archive-title {
-      font-family: var(--font-serif);
-      font-size: clamp(3rem, 7vw, 6rem);
-      line-height: 0.95;
-      letter-spacing: -0.03em;
-      text-align: center;
-      text-shadow: 0 2px 20px rgba(0,0,0,0.3);
-      transition: color 0.3s ease;
-    }
-
-    .archive-subtitle {
-      font-family: var(--font-sans);
-      font-size: 16px;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      opacity: 0.7;
-      margin-top: 0.75rem;
-      transition: opacity 0.2s ease, color 0.3s ease;
-    }
-
-    .archive-date {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      opacity: 0.45;
-      margin-top: 0.5rem;
-      transition: opacity 0.3s ease;
-    }
-
-    .archive-meta {
-      font-family: var(--font-sans);
-      font-size: 13px;
-      font-weight: 300;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      opacity: 0.4;
-      margin-top: 1.25rem;
-      text-align: center;
-      line-height: 2;
-    }
-
-    .archive-content[data-theme="light"] .archive-title,
-    .archive-content[data-theme="light"] .archive-subtitle,
-    .archive-content[data-theme="light"] .archive-meta,
-    .archive-content[data-theme="light"] .archive-date { color: #141414; }
-
-    .archive-content[data-theme="dark"] .archive-title,
-    .archive-content[data-theme="dark"] .archive-subtitle,
-    .archive-content[data-theme="dark"] .archive-meta,
-    .archive-content[data-theme="dark"] .archive-date { color: #ffffff; }
-
-    /* ============================
-       Navigation Arrows
-       ============================ */
-    .nav-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 44px;
-      height: 44px;
-      cursor: pointer;
-      z-index: 10;
-      pointer-events: auto;
-      color: #ffffff;
-      opacity: 0.55;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      background: none;
-      border: none;
-      padding: 0;
-    }
-    .nav-arrow:hover { opacity: 1; }
-    .nav-arrow--left { left: 2rem; }
-    .nav-arrow--left:hover { transform: translateY(-50%) translateX(-4px); }
-    .nav-arrow--right { right: 2rem; }
-    .nav-arrow--right:hover { transform: translateY(-50%) translateX(4px); }
-
-    /* ============================
-       Month Counter (top-right)
-       ============================ */
-    .month-counter {
-      position: absolute;
-      top: 2rem;
-      right: 2rem;
-      z-index: 10;
-      font-family: var(--font-mono);
-      font-size: 14px;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.5);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      pointer-events: none;
-    }
-    .month-counter-current { color: var(--color-amber); font-weight: 500; }
-    .month-counter-divider { opacity: 0.3; }
-    .month-counter-total { opacity: 0.4; }
-
-    /* ============================
-       Navigation Bar
-       ============================ */
-    .top-nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.5rem 2rem;
-    }
-    .top-nav-brand {
-      font-family: var(--font-serif);
-      font-size: 24px;
-      color: #ffffff;
-      text-decoration: none;
-      letter-spacing: 0.02em;
-    }
-    .top-nav-center {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: var(--font-sans);
-      font-size: 13px;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.7);
-      text-transform: uppercase;
-    }
-    .top-nav-center .sep { opacity: 0.3; margin: 0 4px; }
-    .top-nav-center .current { color: var(--color-amber); font-weight: 500; }
-    .top-nav-center .date-range { opacity: 0.5; font-size: 11px; margin-left: 4px; font-family: var(--font-mono); }
-
-    /* ============================
-       Month Timeline
-       ============================ */
-    .month-timeline-wrapper {
-      position: fixed;
-      bottom: 80px;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      padding: 0 1rem;
-      pointer-events: none;
-    }
-    .month-timeline-track {
-      position: relative;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 1rem 0;
-      overflow-x: auto;
-      overflow-y: hidden;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      pointer-events: auto;
-    }
-    .month-timeline-track::-webkit-scrollbar { display: none; }
-    .month-timeline-line {
-      position: absolute;
-      top: 2.25rem;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: rgba(255,255,255,0.1);
-      z-index: 0;
-    }
-    .month-timeline-progress {
-      position: absolute;
-      top: 2.25rem;
-      left: 0;
-      height: 1px;
-      background: linear-gradient(90deg, var(--color-amber) 0%, rgba(242,91,41,0.3) 100%);
-      z-index: 1;
-      transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
-    }
-    .month-timeline-items {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      min-width: 700px;
-      padding: 0 0.5rem;
-    }
-    .month-timeline-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0.25rem 0.5rem;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-    .month-timeline-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.2);
-      border: 2px solid rgba(255,255,255,0.15);
-      transition: all 0.3s ease;
-    }
-    .month-timeline-label {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      font-weight: 400;
-      color: rgba(255,255,255,0.4);
-      letter-spacing: 0.05em;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-    }
-    .month-timeline-en {
-      font-family: var(--font-mono);
-      font-size: 9px;
-      color: rgba(255,255,255,0.2);
-      letter-spacing: 0.05em;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-    }
-    .month-timeline-item.active .month-timeline-dot {
-      background: var(--color-amber);
-      border-color: var(--color-amber);
-      box-shadow: 0 0 12px rgba(242,91,41,0.4);
-      transform: scale(1.3);
-    }
-    .month-timeline-item.active .month-timeline-label { color: #fff; font-weight: 500; }
-    .month-timeline-item.active .month-timeline-en { color: rgba(255,255,255,0.5); }
-    .month-timeline-item:hover .month-timeline-dot { background: rgba(242,91,41,0.5); border-color: rgba(242,91,41,0.6); transform: scale(1.2); }
-    .month-timeline-item:hover .month-timeline-label { color: rgba(255,255,255,0.7); }
-
-    /* ============================
-       Footer Bar
-       ============================ */
-    .footer-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      background: linear-gradient(0deg, rgba(10,10,11,0.95) 0%, rgba(10,10,11,0.8) 100%);
-      border-top: 1px solid rgba(255,255,255,0.06);
-      padding: 0.75rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      backdrop-filter: blur(10px);
-    }
-    .footer-ticker {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .ticker-prompt { color: var(--color-amber); opacity: 0.7; }
-    .ticker-cursor { animation: cursorBlink 1s step-end infinite; color: var(--color-amber); opacity: 0.5; }
-    @keyframes cursorBlink { 0%,100%{opacity:0.5} 50%{opacity:0} }
-    .ticker-word { color: rgba(255,255,255,0.6); letter-spacing: 0.08em; text-transform: uppercase; min-width: 80px; }
-    .footer-hint {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      color: rgba(255,255,255,0.25);
-      letter-spacing: 0.05em;
-      text-align: center;
-      flex: 1;
-    }
-    .footer-copyright {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      color: rgba(255,255,255,0.3);
-      letter-spacing: 0.05em;
-      white-space: nowrap;
-    }
-
-    /* ============================
-       Fullscreen Menu
-       ============================ */
-    .fullscreen-menu {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      background: var(--color-void);
-      display: none;
-      flex-direction: column;
-      padding: 6rem 4rem;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    .fullscreen-menu.open { display: flex; opacity: 1; }
-    .fullscreen-menu-close {
-      position: absolute;
-      top: 1.5rem;
-      right: 2rem;
-      background: none;
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 20px;
-      padding: 8px 20px;
-      color: #fff;
-      font-family: var(--font-sans);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      cursor: pointer;
-      transition: border-color 0.3s ease;
-    }
-    .fullscreen-menu-close:hover { border-color: var(--color-amber); }
-    .menu-links {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem 3rem;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    .menu-link {
-      font-family: var(--font-serif);
-      font-size: clamp(1.5rem, 3vw, 2.5rem);
-      color: #fff;
-      background: none;
-      border: none;
-      cursor: pointer;
-      text-align: left;
-      padding: 0.5rem 0;
-      position: relative;
-      transition: color 0.3s ease;
-    }
-    .menu-link::after {
-      content: '';
-      position: absolute;
-      bottom: 0.5rem;
-      left: 0;
-      width: 0;
-      height: 1px;
-      background: var(--color-amber);
-      transition: width 0.3s ease;
-    }
-    .menu-link:hover::after { width: 100%; }
-    .menu-link:hover { color: var(--color-amber); }
-    .menu-side-info {
-      position: absolute;
-      bottom: 3rem;
-      right: 4rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--color-metal-dark);
-      letter-spacing: 0.08em;
-    }
-
-    /* ============================
-       Responsive
-       ============================ */
-    @media (max-width: 768px) {
-      .nav-arrow { width: 36px; height: 36px; }
-      .nav-arrow--left { left: 1rem; }
-      .nav-arrow--right { right: 1rem; }
-      .archive-title { font-size: clamp(2rem, 8vw, 4rem) !important; }
-      .top-nav-center { display: none; }
-      .menu-links { grid-template-columns: repeat(2, 1fr); }
-      .menu-side-info { display: none; }
-      .footer-hint { display: none; }
-      .footer-bar { padding: 0.5rem 1rem; }
-      .month-timeline-wrapper { bottom: 60px; }
-    }
-
-    ::selection { background: var(--color-amber); color: #fff; }
-  </style>
+        @media (max-width: 640px) {
+            .archive { padding: 1rem; }
+            .month-pill { flex: 0 0 60px; }
+            .hero-caption { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- ============================================================
-       TOP NAVIGATION
-       ============================================================ -->
-  <nav class="top-nav">
-    <a href="#" class="top-nav-brand">PHOTO2026</a>
-    <div class="top-nav-center">
-      <span class="current" id="nav-current">01</span>
-      <span class="sep">/</span>
-      <span>12</span>
-      <span class="sep">|</span>
-      <span id="nav-month">一月</span>
-      <span class="date-range" id="nav-range">01.01 — 01.31</span>
-    </div>
-    <button id="menu-btn" style="
-      font-family: var(--font-sans); font-size: 11px; text-transform: uppercase;
-      letter-spacing: 0.15em; color: #fff; background: none;
-      border: 1px solid rgba(255,255,255,0.3); border-radius: 20px;
-      padding: 8px 20px; cursor: pointer; transition: border-color 0.3s;
-    " onmouseover="this.style.borderColor='#f25b29'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'">
-      月份
-    </button>
-  </nav>
-
-  <!-- ============================================================
-       3D ROOM GALLERY - 12 MONTHS
-       ============================================================ -->
-  <section class="archive-container" id="container">
-    <div class="archive-scroller" id="scroller">
-      <!-- Rooms will be generated by JavaScript -->
+<div class="archive">
+    <div class="header">
+        <h1>2026 摄影集</h1>
+        <p>电子照相馆 · 按月归档</p>
     </div>
 
-    <!-- Content Overlay -->
-    <div class="archive-content" id="overlay" data-theme="dark">
-      <!-- Navigation arrows -->
-      <button class="nav-arrow nav-arrow--left" id="prev-btn" aria-label="上个月">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M15 19l-7-7 7-7"/>
-        </svg>
-      </button>
-      <button class="nav-arrow nav-arrow--right" id="next-btn" aria-label="下个月">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M9 5l7 7-7 7"/>
-        </svg>
-      </button>
-
-      <!-- Title & Info -->
-      <div class="archive-title"></div>
-      <div class="archive-subtitle" id="subtitle" style="opacity:0.7">JANUARY</div>
-      <div class="archive-date" id="date-range" style="opacity:0.45">01.01 — 01.31</div>
-      <div class="archive-meta">
-        <br>
-        <br>
-       
-      </div>
+    <div class="top-bar">
+        <div class="month-indicator">
+            <span id="indicator-num">01</span> / 12 · <span id="indicator-name">一月</span>
+        </div>
+        <button class="menu-btn" id="menuBtn">月份目录</button>
     </div>
 
-    <!-- Month Counter -->
-    <div class="month-counter">
-      <span class="month-counter-current" id="counter-current">01</span>
-      <span class="month-counter-divider">/</span>
-      <span class="month-counter-total">12</span>
+    <!-- 主照片区 -->
+    <div class="hero">
+        <img class="hero-img" id="mainPhoto" src="" alt="月度主视觉">
+        <div class="hero-caption">
+            <div class="hero-caption-left">
+                <span class="hero-month" id="captionMonth">JANUARY</span>
+                <span class="hero-desc" id="captionDate">01.01 — 01.31</span>
+            </div>
+            <div class="hero-desc" id="captionCredit">2026 年度记忆</div>
+        </div>
     </div>
-  </section>
 
-  <!-- ============================================================
-       MONTH TIMELINE
-       ============================================================ -->
-  <div class="month-timeline-wrapper">
-    <div class="month-timeline-track" id="timeline-track">
-      <div class="month-timeline-line"></div>
-      <div class="month-timeline-progress" id="timeline-progress"></div>
-      <div class="month-timeline-items" id="timeline-items">
-        <!-- Timeline items generated by JS -->
-      </div>
+    <!-- 月份时间轴 -->
+    <div class="timeline">
+        <div class="timeline-label">⟡ 时间轴 · 点击切换 ⟡</div>
+        <div class="months-scroll" id="monthsScroll"></div>
+        <div class="nav-arrows">
+            <div class="arrow" id="prevArrow">←</div>
+            <div class="arrow" id="nextArrow">→</div>
+        </div>
     </div>
-  </div>
 
-  <!-- ============================================================
-       FOOTER BAR
-       ============================================================ -->
-  <footer class="footer-bar">
-    <div class="footer-ticker">
-      <span class="ticker-prompt">$</span>
-      <span class="ticker-cursor">_</span>
-      <span class="ticker-word" id="ticker-word">JANUARY</span>
+    <div class="footer-note">
+        ← → 方向键或点击箭头切换 · 点击月份按钮快速跳转
     </div>
-    <div class="footer-hint">
-      使用方向键 ← → 或点击两侧箭头切换月份 · 点击下方月份按钮快速跳转
-    </div>
-    <div class="footer-copyright">&copy; 2026 电子照相馆 · 个人年度摄影集</div>
-  </footer>
+</div>
 
-  <!-- ============================================================
-       FULLSCREEN MENU
-       ============================================================ -->
-  <div class="fullscreen-menu" id="fullscreen-menu">
-    <button class="fullscreen-menu-close" id="menu-close">关闭</button>
-    <div class="menu-links" id="menu-links">
-      <!-- Menu links generated by JS -->
+<!-- 全屏目录 -->
+<div id="fullDir" class="fullscreen-dir">
+    <button class="close-dir" id="closeDir">✕</button>
+    <div class="dir-container">
+        <div class="dir-header">时光索引</div>
+        <div class="dir-grid" id="dirGrid"></div>
     </div>
-    <div class="menu-side-info">
-      <div>2026 年度摄影集</div>
-      <div>电子照相馆</div>
-      <div>12 个月 x 3 张精选</div>
-    </div>
-  </div>
+</div>
 
-  <!-- ============================================================
-       JAVASCRIPT - ALL LOGIC INLINE
-       ============================================================ -->
-  <script>
+<!-- 音乐按钮 -->
+<div class="music-player" id="musicBtn">🎵</div>
+
+<script>
     // ============================================================
-    // MONTH DATA CONFIGURATION
-    // 
-    // 【照片替换区域 - PHOTO_REPLACE】
-    // 修改每个房间 images 对象中的 back/left/right 路径即可替换照片
-    // 照片文件放在与 index.html 同级的 images/months/ 目录下
+    // 照片数据配置
+    // 【照片替换指南】修改下方 photo 字段的路径即可
+    // 建议将照片放在 images/months/ 文件夹下
     // ============================================================
-    const rooms = [
-      {
-        name: "一月", subtitle: "JANUARY", className: "room--waves", theme: "dark",
-        dateRange: "01.01 — 01.31",
-        // ========== 【替换位：一月照片】 ==========
-        images: {
-          back:  "images/months/jan-back.jpg",
-          left:  "images/months/jan-left.jpg",
-          right: "images/months/jan-right.jpg"
-        }
-      },
-      {
-        name: "二月", subtitle: "FEBRUARY", className: "room--monk", theme: "light",
-        dateRange: "02.01 — 02.28",
-        // ========== 【替换位：二月照片】 ==========
-        images: {
-          back:  "images/months/feb-back.jpg",
-          left:  "images/months/feb-left.jpg",
-          right: "images/months/feb-right.jpg"
-        }
-      },
-      {
-        name: "三月", subtitle: "MARCH", className: "room--lighthouse", theme: "dark",
-        dateRange: "03.01 — 03.31",
-        // ========== 【替换位：三月照片】 ==========
-        images: {
-          back:  "images/months/mar-back.jpg",
-          left:  "images/months/mar-left.jpg",
-          right: "images/months/mar-right.jpg"
-        }
-      },
-      {
-        name: "四月", subtitle: "APRIL", className: "room--orlando", theme: "light",
-        dateRange: "04.01 — 04.30",
-        // ========== 【替换位：四月照片】 ==========
-        images: {
-          back:  "images/months/apr-back.jpg",
-          left:  "images/months/apr-left.jpg",
-          right: "images/months/apr-right.jpg"
-        }
-      },
-      {
-        name: "五月", subtitle: "MAY", className: "room--waves", theme: "dark",
-        dateRange: "05.01 — 05.31",
-        // ========== 【替换位：五月照片】 ==========
-        images: {
-          back:  "images/months/may-back.jpg",
-          left:  "images/months/may-left.jpg",
-          right: "images/months/may-right.jpg"
-        }
-      },
-      {
-        name: "六月", subtitle: "JUNE", className: "room--monk", theme: "light",
-        dateRange: "06.01 — 06.30",
-        // ========== 【替换位：六月照片】 ==========
-        images: {
-          back:  "images/months/jun-back.jpg",
-          left:  "images/months/jun-left.jpg",
-          right: "images/months/jun-right.jpg"
-        }
-      },
-      {
-        name: "七月", subtitle: "JULY", className: "room--lighthouse", theme: "dark",
-        dateRange: "07.01 — 07.31",
-        // ========== 【替换位：七月照片】 ==========
-        images: {
-          back:  "images/months/jul-back.jpg",
-          left:  "images/months/jul-left.jpg",
-          right: "images/months/jul-right.jpg"
-        }
-      },
-      {
-        name: "八月", subtitle: "AUGUST", className: "room--orlando", theme: "light",
-        dateRange: "08.01 — 08.31",
-        // ========== 【替换位：八月照片】 ==========
-        images: {
-          back:  "images/months/aug-back.jpg",
-          left:  "images/months/aug-left.jpg",
-          right: "images/months/aug-right.jpg"
-        }
-      },
-      {
-        name: "九月", subtitle: "SEPTEMBER", className: "room--waves", theme: "dark",
-        dateRange: "09.01 — 09.30",
-        // ========== 【替换位：九月照片】 ==========
-        images: {
-          back:  "images/months/sep-back.jpg",
-          left:  "images/months/sep-left.jpg",
-          right: "images/months/sep-right.jpg"
-        }
-      },
-      {
-        name: "十月", subtitle: "OCTOBER", className: "room--monk", theme: "light",
-        dateRange: "10.01 — 10.31",
-        // ========== 【替换位：十月照片】 ==========
-        images: {
-          back:  "images/months/oct-back.jpg",
-          left:  "images/months/oct-left.jpg",
-          right: "images/months/oct-right.jpg"
-        }
-      },
-      {
-        name: "十一月", subtitle: "NOVEMBER", className: "room--lighthouse", theme: "dark",
-        dateRange: "11.01 — 11.30",
-        // ========== 【替换位：十一月照片】 ==========
-        images: {
-          back:  "images/months/nov-back.jpg",
-          left:  "images/months/nov-left.jpg",
-          right: "images/months/nov-right.jpg"
-        }
-      },
-      {
-        name: "十二月", subtitle: "DECEMBER", className: "room--orlando", theme: "dark",
-        dateRange: "12.01 — 12.31",
-        // ========== 【替换位：十二月照片】 ==========
-        images: {
-          back:  "images/months/dec-back.jpg",
-          left:  "images/months/dec-left.jpg",
-          right: "images/months/dec-right.jpg"
-        }
-      }
+    const monthsData = [
+        { name: "一月", en: "JANUARY", abbr: "JAN", date: "01.01 — 01.31", photo: "https://picsum.photos/id/13/1200/800", credit: "新年 · 雪国梦境" },
+        { name: "二月", en: "FEBRUARY", abbr: "FEB", date: "02.01 — 02.28", photo: "https://picsum.photos/id/20/1200/800", credit: "情人节 · 烟火信笺" },
+        { name: "三月", en: "MARCH", abbr: "MAR", date: "03.01 — 03.31", photo: "https://picsum.photos/id/96/1200/800", credit: "樱吹雪 · 春之序曲" },
+        { name: "四月", en: "APRIL", abbr: "APR", date: "04.01 — 04.30", photo: "https://picsum.photos/id/29/1200/800", credit: "细雨青苔 · 绿意蔓延" },
+        { name: "五月", en: "MAY", abbr: "MAY", date: "05.01 — 05.31", photo: "https://picsum.photos/id/169/1200/800", credit: "初夏海岸 · 露营晚风" },
+        { name: "六月", en: "JUNE", abbr: "JUN", date: "06.01 — 06.30", photo: "https://picsum.photos/id/30/1200/800", credit: "儿童气球 · 盛夏前奏" },
+        { name: "七月", en: "JULY", abbr: "JUL", date: "07.01 — 07.31", photo: "https://picsum.photos/id/155/1200/800", credit: "蝉鸣冰饮 · 热烈假日" },
+        { name: "八月", en: "AUGUST", abbr: "AUG", date: "08.01 — 08.31", photo: "https://picsum.photos/id/22/1200/800", credit: "山野星空 · 徒步纪行" },
+        { name: "九月", en: "SEPTEMBER", abbr: "SEP", date: "09.01 — 09.30", photo: "https://picsum.photos/id/104/1200/800", credit: "桂香满阶 · 秋日序曲" },
+        { name: "十月", en: "OCTOBER", abbr: "OCT", date: "10.01 — 10.31", photo: "https://picsum.photos/id/116/1200/800", credit: "银杏金箔 · 丰收颂歌" },
+        { name: "十一月", en: "NOVEMBER", abbr: "NOV", date: "11.01 — 11.30", photo: "https://picsum.photos/id/127/1200/800", credit: "深秋炉火 · 静谧时光" },
+        { name: "十二月", en: "DECEMBER", abbr: "DEC", date: "12.01 — 12.31", photo: "https://picsum.photos/id/142/1200/800", credit: "圣诞颂 · 岁末圆舞" }
     ];
 
-    // ============================================================
-    // DOM REFERENCES
-    // ============================================================
-    const container = document.getElementById('container');
-    const scroller = document.getElementById('scroller');
-    const overlay = document.getElementById('overlay');
-    const subtitleEl = document.getElementById('subtitle');
-    const dateRangeEl = document.getElementById('date-range');
-    const counterCurrent = document.getElementById('counter-current');
-    const navCurrent = document.getElementById('nav-current');
-    const navMonth = document.getElementById('nav-month');
-    const navRange = document.getElementById('nav-range');
-    const timelineProgress = document.getElementById('timeline-progress');
-    const timelineItems = document.getElementById('timeline-items');
-    const tickerWord = document.getElementById('ticker-word');
-    const fullscreenMenu = document.getElementById('fullscreen-menu');
-    const menuLinks = document.getElementById('menu-links');
+    // DOM 元素
+    const mainPhoto = document.getElementById('mainPhoto');
+    const captionMonth = document.getElementById('captionMonth');
+    const captionDate = document.getElementById('captionDate');
+    const captionCredit = document.getElementById('captionCredit');
+    const indicatorNum = document.getElementById('indicator-num');
+    const indicatorName = document.getElementById('indicator-name');
+    const monthsScroll = document.getElementById('monthsScroll');
+    const dirGrid = document.getElementById('dirGrid');
+    const fullDir = document.getElementById('fullDir');
+    const menuBtn = document.getElementById('menuBtn');
+    const closeDir = document.getElementById('closeDir');
+    const prevArrow = document.getElementById('prevArrow');
+    const nextArrow = document.getElementById('nextArrow');
 
-    // ============================================================
-    // STATE
-    // ============================================================
-    let current = 0;
-    let isMoving = false;
-    let mouseEnabled = true;
+    let currentIndex = 0;
 
-    // ============================================================
-    // GENERATE ROOMS
-    // ============================================================
-    const roomElements = [];
-    rooms.forEach((room, i) => {
-      const div = document.createElement('div');
-      div.className = `room ${room.className}`;
-      div.innerHTML = `
-        <div class="room__side room__side--back">
-          <img src="${room.images.back}" alt="${room.name}月 - 背景墙" loading="eager"
-            onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\\'photo-placeholder\\'><div>📷<br>${room.name}月<br><span style=\\'font-size:11px;opacity:0.6\\'>替换照片：修改HTML中images路径</span></div></div>'">
-        </div>
-        <div class="room__side room__side--left">
-          <img src="${room.images.left}" alt="${room.name}月 - 左墙" loading="eager"
-            onerror="this.style.display='none'">
-        </div>
-        <div class="room__side room__side--right">
-          <img src="${room.images.right}" alt="${room.name}月 - 右墙" loading="eager"
-            onerror="this.style.display='none'">
-        </div>
-        <div class="room__side room__side--top"></div>
-        <div class="room__side room__side--bottom"></div>
-      `;
-      scroller.appendChild(div);
-      roomElements.push(div);
-    });
+    // 更新页面内容
+    function updateMonth(index) {
+        const data = monthsData[index];
+        mainPhoto.src = data.photo;
+        captionMonth.textContent = data.en;
+        captionDate.textContent = data.date;
+        captionCredit.textContent = data.credit;
+        indicatorNum.textContent = String(index + 1).padStart(2, '0');
+        indicatorName.textContent = data.name;
 
-    // Initialize first room
-    roomElements[0].classList.add('room--current');
-    roomElements[0].style.opacity = '1';
-    setTransform({ translateZ: '500px' });
+        // 更新时间轴激活样式
+        document.querySelectorAll('.month-pill').forEach((pill, i) => {
+            pill.classList.toggle('active', i === index);
+        });
 
-    // ============================================================
-    // GENERATE TIMELINE
-    // ============================================================
-    const monthLabels = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-    rooms.forEach((room, i) => {
-      const btn = document.createElement('button');
-      btn.className = `month-timeline-item ${i === 0 ? 'active' : ''}`;
-      btn.innerHTML = `
-        <div class="month-timeline-dot"></div>
-        <span class="month-timeline-label">${monthLabels[i]}</span>
-        <span class="month-timeline-en">${room.subtitle}</span>
-      `;
-      btn.addEventListener('click', () => navigateTo(i));
-      timelineItems.appendChild(btn);
-    });
-
-    // ============================================================
-    // GENERATE MENU LINKS
-    // ============================================================
-    rooms.forEach((room, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'menu-link';
-      btn.textContent = `${room.name} · ${room.subtitle}`;
-      btn.addEventListener('click', () => {
-        navigateTo(i);
-        closeMenu();
-      });
-      menuLinks.appendChild(btn);
-    });
-
-    // ============================================================
-    // 3D TRANSFORM HELPERS
-    // ============================================================
-    function setTransform(t) {
-      const tx = t.translateX || '0';
-      const ty = t.translateY || '0';
-      const tz = t.translateZ || '0';
-      const rx = t.rotX || '0';
-      const ry = t.rotY || '0';
-      scroller.style.transform = `translate3d(${tx}, ${ty}, ${tz}) rotate3d(1,0,0,${rx}deg) rotate3d(0,1,0,${ry}deg)`;
+        currentIndex = index;
     }
 
-    // ============================================================
-    // NAVIGATION - Core month switching logic
-    // ============================================================
-    function navigateTo(targetIndex) {
-      if (isMoving || targetIndex === current) return;
-      if (targetIndex < 0 || targetIndex >= rooms.length) return;
-      isMoving = true;
-
-      const prevIndex = current;
-      const nextIndex = targetIndex;
-      const prevRoom = roomElements[prevIndex];
-      const nextRoom = roomElements[nextIndex];
-      const direction = nextIndex > prevIndex ? 'next' : 'prev';
-      const slideDir = direction === 'next' ? '100%' : '-100%';
-
-      // Pre-position incoming room
-      nextRoom.style.transform = `translate3d(${slideDir}, 0, 0)`;
-      nextRoom.style.opacity = '1';
-
-      // Phase 1: Retreat to Z=0
-      scroller.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-      setTransform({});
-
-      setTimeout(() => {
-        // Phase 2: Slide sideways
-        scroller.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-        setTransform({ translateX: slideDir });
-
-        setTimeout(() => {
-          // Phase 3: Swap room, push into new room
-          prevRoom.classList.remove('room--current');
-          nextRoom.classList.add('room--current');
-          prevRoom.style.opacity = '0';
-
-          setTransform({ translateX: slideDir, translateZ: '500px' });
-
-          // Update content
-          const room = rooms[nextIndex];
-          overlay.setAttribute('data-theme', room.theme);
-          subtitleEl.style.opacity = '0';
-          dateRangeEl.style.opacity = '0';
-          setTimeout(() => {
-            subtitleEl.textContent = room.subtitle;
-            dateRangeEl.textContent = room.dateRange;
-            subtitleEl.style.opacity = '0.7';
-            dateRangeEl.style.opacity = '0.45';
-          }, 150);
-
-          // Update all UI
-          updateUI(nextIndex);
-
-          // Phase 4: Silent reset
-          setTimeout(() => {
-            scroller.style.transition = 'none';
-            nextRoom.style.transform = 'translate3d(0,0,0)';
-            setTransform({ translateZ: '500px' });
-            current = nextIndex;
-
-            setTimeout(() => {
-              scroller.style.transition = 'transform 0.3s ease-out';
-              isMoving = false;
-            }, 50);
-          }, 350);
-        }, 350);
-      }, 300);
+    // 切换月份
+    function nextMonth() {
+        let newIdx = currentIndex + 1;
+        if (newIdx >= monthsData.length) newIdx = 0;
+        updateMonth(newIdx);
+    }
+    function prevMonth() {
+        let newIdx = currentIndex - 1;
+        if (newIdx < 0) newIdx = monthsData.length - 1;
+        updateMonth(newIdx);
     }
 
-    function navigate(dir) {
-      const next = dir === 'next'
-        ? (current + 1) % rooms.length
-        : (current - 1 + rooms.length) % rooms.length;
-      navigateTo(next);
-    }
-
-    // ============================================================
-    // UPDATE UI
-    // ============================================================
-    function updateUI(index) {
-      // Counter
-      counterCurrent.textContent = String(index + 1).padStart(2, '0');
-      navCurrent.textContent = String(index + 1).padStart(2, '0');
-      navMonth.textContent = rooms[index].name;
-      navRange.textContent = rooms[index].dateRange;
-
-      // Timeline
-      timelineProgress.style.width = `${(index / 11) * 100}%`;
-      document.querySelectorAll('.month-timeline-item').forEach((item, i) => {
-        item.classList.toggle('active', i === index);
-      });
-
-      // Ticker
-      tickerWord.textContent = rooms[index].subtitle;
-    }
-
-    // ============================================================
-    // MOUSE TILT
-    // ============================================================
-    container.addEventListener('mousemove', (e) => {
-      if (isMoving || !mouseEnabled) return;
-      const rotX = -(e.clientY / window.innerHeight - 0.5) * 4;
-      const rotY = (e.clientX / window.innerWidth - 0.5) * 6;
-      scroller.style.transition = 'transform 0.2s ease-out';
-      scroller.style.transform = `translate3d(0, 0, 500px) rotate3d(1,0,0,${rotX}deg) rotate3d(0,1,0,${rotY}deg)`;
+    // 构建底部时间轴
+    monthsData.forEach((month, idx) => {
+        const pill = document.createElement('div');
+        pill.className = 'month-pill';
+        pill.innerHTML = `<div class="num">${month.name}</div><div class="name">${month.abbr}</div>`;
+        pill.addEventListener('click', () => updateMonth(idx));
+        monthsScroll.appendChild(pill);
     });
 
-    // ============================================================
-    // KEYBOARD
-    // ============================================================
+    // 构建全屏目录
+    monthsData.forEach((month, idx) => {
+        const item = document.createElement('div');
+        item.className = 'dir-item';
+        item.innerHTML = `<div class="cn">${month.name}</div><div class="en">${month.en}</div>`;
+        item.addEventListener('click', () => {
+            fullDir.style.display = 'none';
+            updateMonth(idx);
+        });
+        dirGrid.appendChild(item);
+    });
+
+    // 菜单事件
+    menuBtn.addEventListener('click', () => fullDir.style.display = 'flex');
+    closeDir.addEventListener('click', () => fullDir.style.display = 'none');
+    fullDir.addEventListener('click', (e) => {
+        if (e.target === fullDir) fullDir.style.display = 'none';
+    });
+
+    // 箭头事件
+    prevArrow.addEventListener('click', prevMonth);
+    nextArrow.addEventListener('click', nextMonth);
+
+    // 键盘事件
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') navigate('prev');
-      if (e.key === 'ArrowRight') navigate('next');
-      if (e.key === 'Escape') closeMenu();
+        if (e.key === 'ArrowLeft') prevMonth();
+        if (e.key === 'ArrowRight') nextMonth();
+        if (e.key === 'Escape') fullDir.style.display = 'none';
     });
 
-    // ============================================================
-    // TOUCH / SWIPE
-    // ============================================================
-    let touchStartX = 0;
-    container.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
-    container.addEventListener('touchend', (e) => {
-      const diff = touchStartX - e.changedTouches[0].screenX;
-      if (Math.abs(diff) > 50) {
-        navigate(diff > 0 ? 'next' : 'prev');
-      }
-    }, { passive: true });
+    // 音乐控制（示例轻音乐，可替换链接）
+    const musicBtnElem = document.getElementById('musicBtn');
+    let audio = null;
+    let musicPlaying = false;
+    musicBtnElem.addEventListener('click', () => {
+        if (!audio) {
+            audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+            audio.loop = true;
+            audio.volume = 0.25;
+        }
+        if (musicPlaying) {
+            audio.pause();
+            musicBtnElem.classList.remove('playing');
+            musicBtnElem.innerHTML = '🎵';
+        } else {
+            audio.play().catch(e => console.log('需要用户交互'));
+            musicBtnElem.classList.add('playing');
+            musicBtnElem.innerHTML = '🎶';
+        }
+        musicPlaying = !musicPlaying;
+    });
 
-    // ============================================================
-    // BUTTON LISTENERS
-    // ============================================================
-    document.getElementById('prev-btn').addEventListener('click', () => navigate('prev'));
-    document.getElementById('next-btn').addEventListener('click', () => navigate('next'));
+    // 主图点击放大预览
+    mainPhoto.addEventListener('click', () => {
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.background = 'rgba(0,0,0,0.85)';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.zIndex = '2000';
+        overlay.style.cursor = 'pointer';
+        const bigImg = document.createElement('img');
+        bigImg.src = mainPhoto.src;
+        bigImg.style.maxWidth = '85%';
+        bigImg.style.maxHeight = '85%';
+        bigImg.style.borderRadius = '8px';
+        overlay.appendChild(bigImg);
+        overlay.onclick = () => overlay.remove();
+        document.body.appendChild(overlay);
+    });
 
-    // ============================================================
-    // FULLSCREEN MENU
-    // ============================================================
-    document.getElementById('menu-btn').addEventListener('click', openMenu);
-    document.getElementById('menu-close').addEventListener('click', closeMenu);
-
-    function openMenu() {
-      fullscreenMenu.style.display = 'flex';
-      requestAnimationFrame(() => {
-        fullscreenMenu.style.opacity = '1';
-      });
-    }
-    function closeMenu() {
-      fullscreenMenu.style.opacity = '0';
-      setTimeout(() => {
-        fullscreenMenu.style.display = 'none';
-      }, 400);
-    }
-
-    // ============================================================
-    // TICKER ANIMATION
-    // ============================================================
-    let tickerIndex = 0;
-    const tickerWords = rooms.map(r => r.subtitle);
-    setInterval(() => {
-      tickerWord.style.opacity = '0';
-      setTimeout(() => {
-        tickerIndex = (tickerIndex + 1) % tickerWords.length;
-        tickerWord.textContent = tickerWords[tickerIndex];
-        tickerWord.style.opacity = '1';
-      }, 400);
-    }, 3000);
-
-    // ============================================================
-    // INIT
-    // ============================================================
-    updateUI(0);
-  </script>
+    // 初始化
+    updateMonth(0);
+</script>
 </body>
 </html>
