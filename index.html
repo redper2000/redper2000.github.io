@@ -1,5 +1,399 @@
 <!DOCTYPE html>
-<html>
-<head><title>Test</title></head>
-<body><h1>Hello, GitHub Pages works!</h1></body>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>个人相册 | 时光印记</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f9fafb;
+            color: #1f2937;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 头部信息 */
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            border: 3px solid white;
+        }
+
+        .name {
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #3b82f6, #a855f7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .bio {
+            color: #6b7280;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* 年份导航栏 */
+        .year-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .year-btn {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #4b5563;
+            background-color: #f3f4f6;
+        }
+
+        .year-btn:hover {
+            background-color: #e5e7eb;
+            transform: translateY(-2px);
+        }
+
+        .year-btn.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 10px rgba(59,130,246,0.3);
+        }
+
+        /* 相册网格 */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.8rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .photo-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.1);
+        }
+
+        .photo-img {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s;
+        }
+
+        .photo-card:hover .photo-img {
+            transform: scale(1.02);
+        }
+
+        .photo-caption {
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: #374151;
+            border-top: 1px solid #f3f4f6;
+            background: #ffffff;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* 空状态 */
+        .empty-album {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: #ffffffcc;
+            border-radius: 2rem;
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+
+        /* 模态框 (大图预览) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 85%;
+            border-radius: 24px;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.3);
+            cursor: default;
+        }
+
+        .modal-caption {
+            text-align: center;
+            color: white;
+            margin-top: 1rem;
+            font-size: 1rem;
+            background: rgba(0,0,0,0.6);
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .close-modal:hover {
+            background: #ef4444;
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 640px) {
+            .gallery {
+                gap: 1rem;
+            }
+            .year-btn {
+                padding: 0.4rem 1rem;
+                font-size: 0.85rem;
+            }
+            .name {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 个人资料区（可修改头像、名字、简介） -->
+        <div class="header">
+            <!-- 请将 avatar.jpg 换成你自己的头像图片，也可以删除img标签 -->
+            <img class="avatar" src="https://picsum.photos/id/64/200/200" alt="头像" onerror="this.src='https://picsum.photos/200/200?random=1'">
+            <h1 class="name">王小明的时光相册</h1>
+            <p class="bio">用照片记录生活 · 每一帧都是回忆</p>
+        </div>
+
+        <!-- 年份按钮容器 -->
+        <div class="year-nav" id="yearNav"></div>
+
+        <!-- 照片网格容器 -->
+        <div id="galleryContainer" class="gallery"></div>
+    </div>
+
+    <!-- 大图模态框 -->
+    <div id="modal" class="modal">
+        <span class="close-modal">&times;</span>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <img class="modal-content" id="modalImg">
+            <div id="modalCaption" class="modal-caption"></div>
+        </div>
+    </div>
+
+    <footer>© 2026 个人相册 | 按年份定格美好</footer>
+
+    <script>
+        // ============================================================
+        // 📷 在这里替换为你自己的照片数据
+        // 格式：{ year: 年份, url: "图片地址", caption: "照片描述" }
+        // 注意：图片地址可以使用网络图片，或者上传到仓库后的相对路径（例如 "images/2024/beach.jpg"）
+        // ============================================================
+        const photos = [
+            // 2024 年的照片
+            { year: 2024, url: "https://picsum.photos/id/13/400/300", caption: "夏日山间的瀑布" },
+            { year: 2024, url: "https://picsum.photos/id/15/400/300", caption: "森林里的老朋友" },
+            { year: 2024, url: "https://picsum.photos/id/96/400/300", caption: "午后咖啡时光" },
+            { year: 2024, url: "https://picsum.photos/id/169/400/300", caption: "夕阳下的剪影" },
+            // 2023 年的照片
+            { year: 2023, url: "https://picsum.photos/id/20/400/300", caption: "海边的钢琴" },
+            { year: 2023, url: "https://picsum.photos/id/26/400/300", caption: "威尼斯小巷" },
+            { year: 2023, url: "https://picsum.photos/id/28/400/300", caption: "露营篝火晚会" },
+            { year: 2023, url: "https://picsum.photos/id/29/400/300", caption: "古建筑写生" },
+            // 2022 年的照片
+            { year: 2022, url: "https://picsum.photos/id/30/400/300", caption: "雨后的彩虹" },
+            { year: 2022, url: "https://picsum.photos/id/34/400/300", caption: "秋天的银杏大道" },
+            { year: 2022, url: "https://picsum.photos/id/42/400/300", caption: "音乐节现场" },
+            // 2021 年的照片（可选示例）
+            { year: 2021, url: "https://picsum.photos/id/47/400/300", caption: "雪中的欢乐" },
+            { year: 2021, url: "https://picsum.photos/id/59/400/300", caption: "樱花树下的野餐" }
+        ];
+
+        // ----- 以下代码自动处理分组和渲染，无需手动修改（除非想调整样式）-----
+        
+        // 按年份分组
+        function groupByYear(photoArray) {
+            const groups = {};
+            photoArray.forEach(photo => {
+                if (!groups[photo.year]) groups[photo.year] = [];
+                groups[photo.year].push(photo);
+            });
+            return groups;
+        }
+
+        // 获取所有年份并排序（降序：最新年份在前）
+        function getSortedYears(groups) {
+            return Object.keys(groups).map(Number).sort((a,b) => b - a);
+        }
+
+        // 渲染年份按钮
+        function renderYearButtons(years, currentYear, onClickCallback) {
+            const nav = document.getElementById('yearNav');
+            nav.innerHTML = '';
+            years.forEach(year => {
+                const btn = document.createElement('button');
+                btn.textContent = year;
+                btn.classList.add('year-btn');
+                if (year === currentYear) btn.classList.add('active');
+                btn.addEventListener('click', () => {
+                    onClickCallback(year);
+                    // 更新按钮激活样式
+                    document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+                nav.appendChild(btn);
+            });
+        }
+
+        // 渲染照片网格
+        function renderGallery(photosForYear) {
+            const container = document.getElementById('galleryContainer');
+            if (!photosForYear || photosForYear.length === 0) {
+                container.innerHTML = `<div class="empty-album">📭 这一年暂无照片，等你去记录～</div>`;
+                return;
+            }
+            container.innerHTML = '';
+            photosForYear.forEach((photo, index) => {
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                // 点击卡片预览大图
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openModal(photo.url, photo.caption);
+                });
+                const img = document.createElement('img');
+                img.src = photo.url;
+                img.alt = photo.caption;
+                img.className = 'photo-img';
+                img.loading = 'lazy';
+                const captionDiv = document.createElement('div');
+                captionDiv.className = 'photo-caption';
+                captionDiv.textContent = photo.caption || '无标题';
+                card.appendChild(img);
+                card.appendChild(captionDiv);
+                container.appendChild(card);
+            });
+        }
+
+        // 模态框逻辑
+        const modal = document.getElementById('modal');
+        const modalImg = document.getElementById('modalImg');
+        const modalCaption = document.getElementById('modalCaption');
+        const closeModal = document.querySelector('.close-modal');
+
+        function openModal(imgUrl, caption) {
+            modal.style.display = 'flex';
+            modalImg.src = imgUrl;
+            modalCaption.textContent = caption || ' ';
+        }
+
+        function closeModalFunc() {
+            modal.style.display = 'none';
+        }
+
+        closeModal.addEventListener('click', closeModalFunc);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModalFunc();
+        });
+        // ESC关闭模态框
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'flex') closeModalFunc();
+        });
+
+        // 初始化整个相册
+        function init() {
+            const groups = groupByYear(photos);
+            const years = getSortedYears(groups);
+            if (years.length === 0) {
+                document.getElementById('galleryContainer').innerHTML = '<div class="empty-album">✨ 暂无照片，快去添加 photos 数组吧！</div>';
+                return;
+            }
+            const defaultYear = years[0]; // 默认显示最近年份
+            renderYearButtons(years, defaultYear, (selectedYear) => {
+                // 切换年份时重新渲染对应年份的照片
+                const selectedPhotos = groups[selectedYear] || [];
+                renderGallery(selectedPhotos);
+            });
+            // 初始显示默认年份的照片
+            renderGallery(groups[defaultYear]);
+        }
+
+        // 页面启动
+        init();
+    </script>
+</body>
 </html>
