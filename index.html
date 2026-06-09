@@ -2,483 +2,575 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>电子照相馆 · 2026时间轴</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>时间照相馆 · 线条色块画廊</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none; /* 避免拖动干扰，不影响选中文字 */
+            user-select: none; /* 避免拖动干扰 */
         }
 
         body {
-            background: #fefaf5;   /* 暖白做旧纸质感 */
-            font-family: 'Inter', 'Segoe UI', 'Georgia', 'Times New Roman', serif;
-            overflow: hidden;       /* 隐藏全局滚动条，改用横向滚动 */
+            background: #000000;  /* 纯黑背景，天花板/深邃感 */
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
             height: 100vh;
             width: 100vw;
         }
 
-        /* ---- 横向滚动主容器 ---- */
-        .timeline {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            height: 100vh;
-            width: 100%;
-            scrollbar-width: thin;
-            scrollbar-color: #b9a89a #f0e6dc;
-        }
-        .timeline::-webkit-scrollbar {
-            height: 6px;
-        }
-        .timeline::-webkit-scrollbar-track {
-            background: #f0e6dc;
-            border-radius: 8px;
-        }
-        .timeline::-webkit-scrollbar-thumb {
-            background: #b9a89a;
-            border-radius: 8px;
-        }
-
-        /* 每个月份为一屏 */
-        .month-panel {
-            flex: 0 0 100vw;
-            scroll-snap-align: start;
-            overflow-y: auto;
-            padding: 2rem 3rem;
-            position: relative;
-            background: #fefaf5;
-            transition: background 0.2s;
-        }
-
-        /* 月份标题区 - 艺术感 */
-        .month-header {
-            text-align: center;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid #e2dcd5;
-            padding-bottom: 1rem;
-        }
-        .month-name {
-            font-size: 3.5rem;
-            font-weight: 400;
-            letter-spacing: 6px;
-            color: #2b2a28;
-            font-family: 'Times New Roman', serif;
-            text-transform: uppercase;
-        }
-        .year-sub {
-            font-size: 0.9rem;
-            color: #9e8f83;
-            margin-top: 0.25rem;
-            letter-spacing: 2px;
-        }
-
-        /* 照片网格 - 类似胶片陈列 */
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 1.8rem;
-            margin-top: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .photo-card {
-            background: #ffffffd9;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 12px 22px -12px rgba(0, 0, 0, 0.08);
-            transition: transform 0.25s ease, box-shadow 0.25s;
-            cursor: pointer;
-            backdrop-filter: blur(2px);
-            border: 1px solid #f3ede7;
-        }
-        .photo-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.2);
-        }
-        .photo-img {
-            width: 100%;
-            aspect-ratio: 4 / 3;
-            object-fit: cover;
-            display: block;
-            transition: scale 0.3s;
-        }
-        .photo-caption {
-            padding: 0.8rem;
-            font-size: 0.85rem;
-            text-align: center;
-            color: #4a3f37;
-            background: white;
-            font-family: system-ui;
-            border-top: 1px solid #f3ede7;
-        }
-
-        /* 空月份诗意占位 */
-        .empty-month {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: rgba(245, 240, 235, 0.7);
-            border-radius: 48px;
-            color: #b9a89a;
-            font-style: italic;
-            font-size: 1.2rem;
-        }
-
-        /* 左侧/右侧导航装饰箭头 (简易悬浮) */
-        .nav-arrow {
-            position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 44px;
-            height: 44px;
-            background: rgba(190, 170, 150, 0.3);
-            backdrop-filter: blur(4px);
-            border-radius: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: #5c4b3a;
-            cursor: pointer;
-            z-index: 20;
-            transition: all 0.2s;
-            font-weight: 300;
-            border: none;
-        }
-        .nav-arrow:hover {
-            background: rgba(140, 110, 90, 0.6);
-            color: white;
-        }
-        .nav-left {
-            left: 20px;
-        }
-        .nav-right {
-            right: 20px;
-        }
-
-        /* 全屏模态框 (大图预览) */
-        .modal-overlay {
-            display: none;
+        /* 主画廊容器 - 固定视角的房间 */
+        .gallery-stage {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.88);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
-        .modal-content {
-            max-width: 85vw;
-            max-height: 85vh;
-            border-radius: 28px;
-            box-shadow: 0 30px 40px rgba(0,0,0,0.4);
-        }
-        .modal-caption {
-            text-align: center;
-            color: #eee;
-            margin-top: 1rem;
-            font-size: 1rem;
-            background: rgba(0,0,0,0.5);
-            padding: 0.4rem 1.2rem;
-            border-radius: 40px;
-            display: inline-block;
-        }
-        .close-modal {
-            position: absolute;
-            top: 30px;
-            right: 40px;
-            font-size: 2rem;
-            color: white;
-            background: rgba(0,0,0,0.4);
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
             display: flex;
-            align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .close-modal:hover {
-            background: #b05133;
+            align-items: center;
+            perspective: 1200px;  /* 透视深度，产生空间感 */
+            perspective-origin: 50% 45%;
+            background: #000000;
         }
 
-        /* 底部时间轴小圆点 (指示器) */
-        .dot-indicators {
+        /* 房间容器：模拟三面墙的3D空间 */
+        .room {
+            position: relative;
+            width: 900px;
+            height: 600px;
+            transform-style: preserve-3d;
+            transform: translateZ(0) rotateX(0deg);
+            transition: all 0.3s ease;
+        }
+
+        /* 共用墙面样式 */
+        .wall {
+            position: absolute;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            box-shadow: inset 0 0 0 2px rgba(0,0,0,0.9), 0 0 0 4px #000000;  /* 黑色线条边框 */
+            transition: background-color 0.2s, background-image 0.2s;
+        }
+
+        /* 正面墙 (正对观看者) */
+        .wall-front {
+            width: 100%;
+            height: 100%;
+            transform: translateZ(300px);
+            background-color: #d9c8b2;  /* 基础米色，会被js动态替换 */
+            background-position: center;
+            background-size: cover;
+            box-shadow: 0 0 0 4px #000, inset 0 0 0 3px #000;
+        }
+
+        /* 左侧墙 (向右倾斜) */
+        .wall-left {
+            width: 400px;
+            height: 100%;
+            transform: rotateY(90deg) translateX(-200px) translateZ(150px);
+            transform-origin: left center;
+            background-color: #b13e3e;
+            right: auto;
+            left: -200px;
+            top: 0;
+            box-shadow: inset 0 0 0 3px #000, 2px 0 0 0 #000;
+        }
+
+        /* 右侧墙 (向左倾斜) */
+        .wall-right {
+            width: 400px;
+            height: 100%;
+            transform: rotateY(-90deg) translateX(200px) translateZ(150px);
+            transform-origin: right center;
+            background-color: #2c4763;
+            right: -200px;
+            top: 0;
+            box-shadow: inset 0 0 0 3px #000, -2px 0 0 0 #000;
+        }
+
+        /* 地面线框 (装饰黑色线条感) */
+        .floor-lines {
+            position: absolute;
+            bottom: -80px;
+            width: 100%;
+            height: 80px;
+            transform: rotateX(70deg) translateY(40px);
+            background: repeating-linear-gradient(90deg, #222 0px, #222 2px, transparent 2px, transparent 30px);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* 天花板黑色横条 (加强结构) */
+        .ceiling-line {
+            position: absolute;
+            top: -30px;
+            width: 100%;
+            height: 30px;
+            background: #000000;
+            transform: rotateX(-20deg);
+            pointer-events: none;
+        }
+
+        /* 相框样式 (照片位置) */
+        .photo-frame {
+            position: absolute;
+            background: #0a0a0a;
+            border: 4px solid #000000;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            background-color: #1a1a1a;
+        }
+        .photo-frame:hover {
+            transform: scale(1.02);
+        }
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* 正面画框 (主视觉) */
+        .front-photo {
+            width: 380px;
+            height: 280px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        /* 左侧墙画框 */
+        .left-photo {
+            width: 240px;
+            height: 200px;
+            right: 30px;
+            bottom: 40px;
+            transform: rotateY(0deg); 
+            /* 因为父容器已旋转，这里不需要额外旋转，保持视觉平行于墙面 */
+        }
+
+        /* 右侧墙画框 */
+        .right-photo {
+            width: 240px;
+            height: 200px;
+            left: 30px;
+            bottom: 40px;
+        }
+
+        /* 月份标签 (挂在正面墙顶部) */
+        .month-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(6px);
+            padding: 6px 16px;
+            border-radius: 40px;
+            color: #f5e7d9;
+            font-weight: 500;
+            letter-spacing: 2px;
+            font-size: 1rem;
+            border-left: 3px solid #d4af7a;
+            z-index: 20;
+            font-family: monospace;
+        }
+
+        /* 底部时间轴 (横向滑动) */
+        .timeline-footer {
             position: fixed;
-            bottom: 20px;
+            bottom: 24px;
             left: 0;
             right: 0;
             display: flex;
             justify-content: center;
-            gap: 12px;
-            z-index: 15;
+            z-index: 200;
+            pointer-events: none;
         }
-        .dot {
-            width: 8px;
-            height: 8px;
-            background: #d1c2b4;
-            border-radius: 50%;
-            transition: all 0.2s;
+        .timeline-track {
+            background: rgba(10,10,15,0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 10px 24px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            max-width: 90vw;
+            pointer-events: auto;
+            border: 1px solid rgba(255,255,220,0.25);
+            scrollbar-width: thin;
+        }
+        .month-tab {
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 40px;
+            background: transparent;
+            color: #e0d6c8;
             cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-family: 'Inter', monospace;
+            letter-spacing: 1px;
         }
-        .dot.active {
-            width: 28px;
-            background: #9e7f64;
-            border-radius: 12px;
+        .month-tab.active {
+            background: #c9a87b;
+            color: #0a0a0a;
+            box-shadow: 0 0 8px rgba(201,168,123,0.6);
         }
 
-        /* 响应式微调 */
-        @media (max-width: 760px) {
-            .month-panel {
-                padding: 1.5rem;
-            }
-            .month-name {
-                font-size: 2.2rem;
-            }
-            .photo-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 1rem;
-            }
-            .nav-arrow {
-                width: 36px;
-                height: 36px;
-                font-size: 1.5rem;
-            }
+        /* 右上角菜单目录按钮 */
+        .menu-btn {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            width: 52px;
+            height: 52px;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 200;
+            font-size: 26px;
+            color: #f0f0f0;
+            border: 1px solid rgba(255,255,200,0.3);
+            transition: 0.2s;
+        }
+        .menu-btn:hover {
+            background: #1f1b2e;
+            border-color: #dbbc87;
+        }
+
+        /* 全屏目录黑幕 */
+        .directory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Cormorant Garamond', serif;
+            overflow-y: auto;
+        }
+        .dir-container {
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+        .dir-title {
+            font-size: 3rem;
+            letter-spacing: 6px;
+            margin-bottom: 2.5rem;
+            color: #e2d4c0;
+            border-bottom: 1px solid #3a3a44;
+            display: inline-block;
+            padding-bottom: 8px;
+        }
+        .months-dir-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+        .dir-item {
+            background: rgba(25,25,35,0.7);
+            border: 1px solid #4a4a5a;
+            padding: 1.2rem;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .dir-item:hover {
+            background: #2a2a3a;
+            border-color: #c9a87b;
+            transform: translateY(-4px);
+        }
+        .dir-month {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: #efdfc7;
+        }
+        .dir-abbr {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #b89a70;
+            margin-top: 6px;
+        }
+        .close-dir {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .close-dir:hover {
+            color: white;
+        }
+
+        /* 音乐按钮 (右下角) */
+        .music-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            font-size: 22px;
+            color: #f0e0ce;
+            border: 1px solid rgba(255,255,200,0.3);
+        }
+        .music-btn.playing {
+            color: #ffdd99;
+            border-color: #e7bc7e;
+        }
+
+        @media (max-width: 800px) {
+            .room { transform: scale(0.7); width: 900px; height: 600px; }
+            .month-tab { font-size: 0.7rem; padding: 4px 12px; }
+        }
+        @media (max-width: 600px) {
+            .room { transform: scale(0.55); }
         }
     </style>
 </head>
 <body>
 
-<!-- 左右导航箭头 -->
-<button class="nav-arrow nav-left" id="prevBtn">←</button>
-<button class="nav-arrow nav-right" id="nextBtn">→</button>
-<!-- 底部月份指示器 -->
-<div class="dot-indicators" id="dotContainer"></div>
-
-<!-- 主时间轴容器 -->
-<div class="timeline" id="timeline">
-    <!-- 月份面板将由 JS 动态生成，便于管理和数据替换 -->
+<div class="gallery-stage">
+    <div class="room" id="roomContainer">
+        <!-- 三面墙 -->
+        <div class="wall wall-front" id="frontWall"></div>
+        <div class="wall wall-left" id="leftWall"></div>
+        <div class="wall wall-right" id="rightWall"></div>
+        <!-- 地面装饰线 -->
+        <div class="floor-lines"></div>
+        <div class="ceiling-line"></div>
+        
+        <!-- 相框位置 (正面照片) -->
+        <div class="photo-frame front-photo" id="frontPhotoFrame">
+            <img id="frontImg" alt="正面照片" src="">
+        </div>
+        <!-- 左侧墙照片 -->
+        <div class="photo-frame left-photo" id="leftPhotoFrame">
+            <img id="leftImg" alt="左侧照片" src="">
+        </div>
+        <!-- 右侧墙照片 -->
+        <div class="photo-frame right-photo" id="rightPhotoFrame">
+            <img id="rightImg" alt="右侧照片" src="">
+        </div>
+        <!-- 月份标识 -->
+        <div class="month-badge" id="monthBadge">一月 · JAN</div>
+    </div>
 </div>
 
-<!-- 模态框 -->
-<div id="photoModal" class="modal-overlay">
-    <span class="close-modal">&times;</span>
-    <div style="display: flex; flex-direction: column; align-items: center;">
-        <img class="modal-content" id="modalImg" alt="大图">
-        <div id="modalCaption" class="modal-caption"></div>
+<!-- 底部时间轴 -->
+<div class="timeline-footer">
+    <div class="timeline-track" id="timelineTrack"></div>
+</div>
+
+<!-- 右上角目录按钮 -->
+<div class="menu-btn" id="menuBtn">☰</div>
+
+<!-- 音乐控制 -->
+<div class="music-btn" id="musicBtn">🎵</div>
+
+<!-- 全屏目录 -->
+<div id="directoryOverlay" class="directory-overlay">
+    <div class="close-dir" id="closeDirBtn">✕</div>
+    <div class="dir-container">
+        <div class="dir-title">时光目录</div>
+        <div class="months-dir-grid" id="dirGrid"></div>
     </div>
 </div>
 
 <script>
     // ============================================================
-    // 📷📷📷【照片数据区域】请在这里替换您自己的照片链接 ==========
+    // 1. 定义每个月的数据：墙面主色调 + 照片地址 (正面+左侧+右侧)
+    // 颜色按照高级红/蓝/米色循环，纯黑线条自动由css边框表现
     // ============================================================
-    // 格式: { month: 1~12, url: "图片地址", caption: "照片描述" }
-    // 您可以根据需要增加或删除照片，月份会自动生成面板。
-    // 所有图片建议使用真实可访问的URL（可以放在images文件夹内，比如 "images/jan/01.jpg"）
-    // 示例数据包含占位图（LoremFlick / picsum），替换时保留此结构。
-    const photosData = [
-        // 一月 (January)
-        { month: 1, url: "https://picsum.photos/id/13/500/400", caption: "新年初雪 · 静谧庭院" },
-        { month: 1, url: "https://picsum.photos/id/15/500/400", caption: "晨雾森林" },
-        // 二月
-        { month: 2, url: "https://picsum.photos/id/20/500/400", caption: "情人节的手写信" },
-        { month: 2, url: "https://picsum.photos/id/26/500/400", caption: "春节烟花漫舞" },
-        { month: 2, url: "https://picsum.photos/id/28/500/400", caption: "围炉夜话" },
-        // 三月
-        { month: 3, url: "https://picsum.photos/id/96/500/400", caption: "樱花隧道" },
-        // 四月 (无示例照片 → 会显示诗意占位)
-        // 五月
-        { month: 5, url: "https://picsum.photos/id/169/500/400", caption: "劳动节远足" },
-        { month: 5, url: "https://picsum.photos/id/42/500/400", caption: "海边营地" },
-        // 六月
-        { month: 6, url: "https://picsum.photos/id/30/500/400", caption: "儿童节气球派对" },
-        // 七月
-        { month: 7, url: "https://picsum.photos/id/59/500/400", caption: "盛夏冰淇淋车" },
-        // 八月
-        { month: 8, url: "https://picsum.photos/id/47/500/400", caption: "高山徒步" },
-        // 九月
-        { month: 9, url: "https://picsum.photos/id/34/500/400", caption: "开学季书店" },
-        // 十月
-        { month: 10, url: "https://picsum.photos/id/29/500/400", caption: "银杏叶落" },
-        // 十一月
-        { month: 11, url: "https://picsum.photos/id/64/500/400", caption: "咖啡暖意" },
-        // 十二月
-        { month: 12, url: "https://picsum.photos/id/91/500/400", caption: "圣诞树影" },
-        { month: 12, url: "https://picsum.photos/id/100/500/400", caption: "跨年倒计时" }
+    const monthsData = [
+        { name: "一月", abbr: "JAN", color: "#b13e3e", front: "https://picsum.photos/id/13/800/600", left: "https://picsum.photos/id/15/600/500", right: "https://picsum.photos/id/20/600/500" },
+        { name: "二月", abbr: "FEB", color: "#2c4763", front: "https://picsum.photos/id/26/800/600", left: "https://picsum.photos/id/28/600/500", right: "https://picsum.photos/id/29/600/500" },
+        { name: "三月", abbr: "MAR", color: "#d7bd92", front: "https://picsum.photos/id/96/800/600", left: "https://picsum.photos/id/34/600/500", right: "https://picsum.photos/id/42/600/500" },
+        { name: "四月", abbr: "APR", color: "#9e3c3c", front: "https://picsum.photos/id/47/800/600", left: "https://picsum.photos/id/59/600/500", right: "https://picsum.photos/id/64/600/500" },
+        { name: "五月", abbr: "MAY", color: "#2a5f7a", front: "https://picsum.photos/id/169/800/600", left: "https://picsum.photos/id/91/600/500", right: "https://picsum.photos/id/100/600/500" },
+        { name: "六月", abbr: "JUN", color: "#e1caa7", front: "https://picsum.photos/id/30/800/600", left: "https://picsum.photos/id/44/600/500", right: "https://picsum.photos/id/45/600/500" },
+        { name: "七月", abbr: "JUL", color: "#ad4b4b", front: "https://picsum.photos/id/155/800/600", left: "https://picsum.photos/id/120/600/500", right: "https://picsum.photos/id/123/600/500" },
+        { name: "八月", abbr: "AUG", color: "#315d82", front: "https://picsum.photos/id/22/800/600", left: "https://picsum.photos/id/39/600/500", right: "https://picsum.photos/id/52/600/500" },
+        { name: "九月", abbr: "SEP", color: "#cfb787", front: "https://picsum.photos/id/104/800/600", left: "https://picsum.photos/id/106/600/500", right: "https://picsum.photos/id/108/600/500" },
+        { name: "十月", abbr: "OCT", color: "#b24444", front: "https://picsum.photos/id/116/800/600", left: "https://picsum.photos/id/118/600/500", right: "https://picsum.photos/id/119/600/500" },
+        { name: "十一月", abbr: "NOV", color: "#2c5a73", front: "https://picsum.photos/id/127/800/600", left: "https://picsum.photos/id/129/600/500", right: "https://picsum.photos/id/131/600/500" },
+        { name: "十二月", abbr: "DEC", color: "#dac29c", front: "https://picsum.photos/id/142/800/600", left: "https://picsum.photos/id/145/600/500", right: "https://picsum.photos/id/146/600/500" }
     ];
 
-    // ---------- 辅助数据 ----------
-    const monthNames = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
+    // 获取DOM元素
+    const frontWall = document.getElementById('frontWall');
+    const leftWall = document.getElementById('leftWall');
+    const rightWall = document.getElementById('rightWall');
+    const frontImg = document.getElementById('frontImg');
+    const leftImg = document.getElementById('leftImg');
+    const rightImg = document.getElementById('rightImg');
+    const monthBadge = document.getElementById('monthBadge');
     
-    // 按月份整理照片 (1~12)
-    function groupPhotosByMonth() {
-        const groups = {};
-        for (let i = 1; i <= 12; i++) groups[i] = [];
-        photosData.forEach(photo => {
-            if (photo.month >= 1 && photo.month <= 12) {
-                groups[photo.month].push(photo);
-            }
+    let currentMonthIndex = 0;  // 0-11
+
+    // 更新墙面颜色+照片+标签
+    function switchToMonth(index) {
+        const data = monthsData[index];
+        if (!data) return;
+        // 更新三面墙背景色 (纯色色块，黑色线条由css负责)
+        frontWall.style.backgroundColor = data.color;
+        leftWall.style.backgroundColor = data.color;
+        rightWall.style.backgroundColor = data.color;
+        
+        // 更新照片 (正面，左侧，右侧)
+        frontImg.src = data.front;
+        leftImg.src = data.left;
+        rightImg.src = data.right;
+        
+        // 月份标识
+        monthBadge.innerHTML = `${data.name} · ${data.abbr}`;
+        
+        // 底部tab激活样式
+        document.querySelectorAll('.month-tab').forEach((tab, idx) => {
+            if (idx === index) tab.classList.add('active');
+            else tab.classList.remove('active');
         });
-        return groups;
-    }
-
-    // 创建单个月份面板的DOM
-    function createMonthPanel(month, photosList) {
-        const panel = document.createElement('div');
-        panel.className = 'month-panel';
-        panel.dataset.month = month;
-
-        // 标题区
-        const headerDiv = document.createElement('div');
-        headerDiv.className = 'month-header';
-        headerDiv.innerHTML = `
-            <div class="month-name">${monthNames[month-1]}</div>
-            <div class="year-sub">2026 · ${month} / 12</div>
-        `;
-        panel.appendChild(headerDiv);
-
-        // 内容区（照片网格或空状态）
-        const contentDiv = document.createElement('div');
-        if (photosList.length === 0) {
-            contentDiv.className = 'empty-month';
-            contentDiv.innerText = '✨ 此刻静默 · 等待光影 ✨';
-        } else {
-            const grid = document.createElement('div');
-            grid.className = 'photo-grid';
-            photosList.forEach(photo => {
-                const card = document.createElement('div');
-                card.className = 'photo-card';
-                const img = document.createElement('img');
-                img.src = photo.url;
-                img.alt = photo.caption;
-                img.className = 'photo-img';
-                img.loading = 'lazy';
-                const captionSpan = document.createElement('div');
-                captionSpan.className = 'photo-caption';
-                captionSpan.innerText = photo.caption;
-                card.appendChild(img);
-                card.appendChild(captionSpan);
-                // 点击照片放大预览
-                card.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    openModal(photo.url, photo.caption);
-                });
-                grid.appendChild(card);
-            });
-            contentDiv.appendChild(grid);
-        }
-        panel.appendChild(contentDiv);
-        return panel;
-    }
-
-    // 全局变量
-    let currentMonthIndex = 0;      // 0-based 月份索引 (0=一月)
-    const timeline = document.getElementById('timeline');
-    let panels = [];        // 存储所有月份panel元素
-    let dots = [];          // 存储小圆点元素
-
-    // 更新指示器高亮
-    function updateIndicators(activeIndex) {
-        dots.forEach((dot, idx) => {
-            if (idx === activeIndex) dot.classList.add('active');
-            else dot.classList.remove('active');
-        });
-    }
-
-    // 滚动到指定月份（平滑）
-    function scrollToMonth(index) {
-        if (!panels[index]) return;
-        panels[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
         currentMonthIndex = index;
-        updateIndicators(currentMonthIndex);
     }
 
-    // 监听滚动结束，更新当前月份和指示器
-    function bindScrollObserver() {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && entry.target.classList.contains('month-panel')) {
-                    const idx = panels.findIndex(p => p === entry.target);
-                    if (idx !== -1) {
-                        currentMonthIndex = idx;
-                        updateIndicators(currentMonthIndex);
-                    }
-                }
-            });
-        }, { threshold: 0.6 }); // 超过60%可见时切换
-        panels.forEach(panel => observer.observe(panel));
-    }
-
-    // 模态框逻辑
-    const modal = document.getElementById('photoModal');
-    const modalImg = document.getElementById('modalImg');
-    const modalCaptionSpan = document.getElementById('modalCaption');
-    const closeModalBtn = document.querySelector('.close-modal');
-    function openModal(imgUrl, caption) {
-        modal.style.display = 'flex';
-        modalImg.src = imgUrl;
-        modalCaptionSpan.innerText = caption || '';
-    }
-    function closeModalFunc() {
-        modal.style.display = 'none';
-    }
-    closeModalBtn.addEventListener('click', closeModalFunc);
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModalFunc();
+    // ---------- 构建底部时间轴 ----------
+    const timelineTrack = document.getElementById('timelineTrack');
+    monthsData.forEach((month, idx) => {
+        const tab = document.createElement('div');
+        tab.className = 'month-tab';
+        tab.textContent = `${month.abbr} · ${month.name}`;
+        tab.dataset.idx = idx;
+        tab.addEventListener('click', (e) => {
+            e.stopPropagation();
+            switchToMonth(idx);
+        });
+        timelineTrack.appendChild(tab);
     });
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.style.display === 'flex') closeModalFunc();
+    
+    // ---------- 全屏目录 (黑色画布 + 月份+英文简写) ----------
+    const dirOverlay = document.getElementById('directoryOverlay');
+    const dirGrid = document.getElementById('dirGrid');
+    const menuBtn = document.getElementById('menuBtn');
+    const closeDirBtn = document.getElementById('closeDirBtn');
+    
+    monthsData.forEach((month, idx) => {
+        const dirItem = document.createElement('div');
+        dirItem.className = 'dir-item';
+        dirItem.innerHTML = `<div class="dir-month">${month.name}</div><div class="dir-abbr">${month.abbr}</div>`;
+        dirItem.addEventListener('click', () => {
+            dirOverlay.style.display = 'none';
+            switchToMonth(idx);
+        });
+        dirGrid.appendChild(dirItem);
     });
-
-    // 构建整个时间轴
-    function buildGallery() {
-        const groups = groupPhotosByMonth();
-        timeline.innerHTML = '';
-        panels = [];
-        // 按月顺序1-12生成
-        for (let month = 1; month <= 12; month++) {
-            const monthPhotos = groups[month];
-            const panel = createMonthPanel(month, monthPhotos);
-            timeline.appendChild(panel);
-            panels.push(panel);
+    
+    menuBtn.addEventListener('click', () => {
+        dirOverlay.style.display = 'flex';
+    });
+    closeDirBtn.addEventListener('click', () => {
+        dirOverlay.style.display = 'none';
+    });
+    dirOverlay.addEventListener('click', (e) => {
+        if (e.target === dirOverlay) dirOverlay.style.display = 'none';
+    });
+    
+    // 初始化默认一月
+    switchToMonth(0);
+    
+    // ---------- 轻量BGM控制 (示例优雅音乐) ----------
+    const musicBtn = document.getElementById('musicBtn');
+    let audio = null;
+    let playing = false;
+    musicBtn.addEventListener('click', () => {
+        if (!audio) {
+            audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3');
+            audio.loop = true;
+            audio.volume = 0.3;
         }
-
-        // 生成底部小圆点
-        const dotContainer = document.getElementById('dotContainer');
-        dotContainer.innerHTML = '';
-        dots = [];
-        for (let i = 0; i < 12; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'dot';
-            dot.addEventListener('click', () => scrollToMonth(i));
-            dotContainer.appendChild(dot);
-            dots.push(dot);
+        if (playing) {
+            audio.pause();
+            musicBtn.classList.remove('playing');
+            musicBtn.innerHTML = '🎵';
+        } else {
+            audio.play().catch(e => console.log("需要用户交互", e));
+            musicBtn.classList.add('playing');
+            musicBtn.innerHTML = '🎶';
         }
-        // 默认高亮第一个月份
-        updateIndicators(0);
-        // 监听滚动以同步dots
-        bindScrollObserver();
+        playing = !playing;
+    });
+    
+    // 可选：点击照片放大预览（简易弹框）
+    function addPhotoZoom(imgElement, src) {
+        imgElement.parentElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = 0;
+            modal.style.left = 0;
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.background = 'rgba(0,0,0,0.9)';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            modal.style.zIndex = 3000;
+            modal.style.cursor = 'pointer';
+            const bigImg = document.createElement('img');
+            bigImg.src = src;
+            bigImg.style.maxWidth = '85%';
+            bigImg.style.maxHeight = '85%';
+            bigImg.style.borderRadius = '12px';
+            bigImg.style.boxShadow = '0 0 30px rgba(0,0,0,0.5)';
+            modal.appendChild(bigImg);
+            modal.onclick = () => modal.remove();
+            document.body.appendChild(modal);
+        });
     }
-
-    // 左右箭头事件
-    document.getElementById('prevBtn').addEventListener('click', () => {
-        if (currentMonthIndex > 0) scrollToMonth(currentMonthIndex - 1);
-    });
-    document.getElementById('nextBtn').addEventListener('click', () => {
-        if (currentMonthIndex < 11) scrollToMonth(currentMonthIndex + 1);
-    });
-
-    // 启动
-    buildGallery();
+    addPhotoZoom(frontImg, monthsData[0].front);
+    addPhotoZoom(leftImg, monthsData[0].left);
+    addPhotoZoom(rightImg, monthsData[0].right);
+    // 动态更新时重置预览（简单处理：每次切换后重新绑定新src的预览）
+    function rebindZoom() {
+        addPhotoZoom(frontImg, frontImg.src);
+        addPhotoZoom(leftImg, leftImg.src);
+        addPhotoZoom(rightImg, rightImg.src);
+    }
+    const origSwitch = switchToMonth;
+    window.switchToMonth = function(idx) {
+        origSwitch(idx);
+        setTimeout(rebindZoom, 50);
+    };
+    switchToMonth = function(idx) {
+        origSwitch(idx);
+        setTimeout(rebindZoom, 50);
+    };
+    rebindZoom();
 </script>
 </body>
 </html>
