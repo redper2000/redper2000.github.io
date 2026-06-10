@@ -2,28 +2,28 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>禾禾成长日记</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>PHOTO</title>
     <style>
+        /* ================= 全局重置 & 字体 ================= */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
         }
 
         body {
-            font-family: 'Inter', system-ui, sans-serif;
+            /* 中文字体：宋体；英文字体：黑体 */
+            font-family: 'SimHei', 'Microsoft YaHei', '黑体', 'Helvetica Neue', 'Arial', sans-serif;
+            background: #102b3f;  /* 普鲁士蓝基底 */
             min-height: 100vh;
-            color: #1f1b17;
             overflow-x: hidden;
-            background: #2c2a28;
+            position: relative;
         }
 
-        /* 撞色背景层：鲜明硬边色块 */
-        .art-bg {
+        /* ================= 普鲁士蓝同心圆波浪扩散动画 ================= */
+        .ripple-bg {
             position: fixed;
             top: 0;
             left: 0;
@@ -31,763 +31,467 @@
             height: 100%;
             z-index: 0;
             pointer-events: none;
-        }
-        .block-prussian {
-            position: absolute;
-            background: #003153;
-            width: 45%;
-            height: 65%;
-            top: 0;
-            left: 0;
-            clip-path: polygon(0% 0%, 100% 0%, 80% 100%, 0% 100%);
-        }
-        .block-burgundy {
-            position: absolute;
-            background: #6e2c2f;
-            width: 55%;
-            height: 70%;
-            bottom: 0;
-            right: 0;
-            clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
-        }
-        .block-mustard {
-            position: absolute;
-            background: #d4af37;
-            width: 35%;
-            height: 40%;
-            top: 30%;
-            right: 8%;
-            clip-path: polygon(0% 0%, 100% 20%, 80% 100%, 0% 80%);
-            opacity: 0.9;
-        }
-        .block-terracotta {
-            position: absolute;
-            background: #c2572c;
-            width: 30%;
-            height: 28%;
-            bottom: 15%;
-            left: 12%;
-            clip-path: polygon(30% 0%, 100% 0%, 85% 100%, 0% 100%);
-            opacity: 0.85;
-        }
-        .block-darkgreen {
-            position: absolute;
-            background: #1e4d4d;
-            width: 28%;
-            height: 35%;
-            top: 55%;
-            left: 55%;
-            clip-path: polygon(0% 0%, 100% 0%, 80% 100%, 0% 70%);
-            opacity: 0.7;
+            background: radial-gradient(circle at 30% 40%, rgba(44, 95, 122, 0.2) 0%, #0a2a3b 80%);
+            overflow: hidden;
         }
 
-        /* 滚动容器 */
-        .scroll-container {
-            scroll-snap-type: y mandatory;
-            overflow-y: scroll;
-            height: 100vh;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            position: relative;
-            z-index: 2;
-        }
-
-        .month-screen {
-            scroll-snap-align: start;
-            min-height: 100vh;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 1.5rem 1.5rem;
-            position: relative;
+        /* 动态同心圆波纹 (三层) */
+        .wave-circle {
+            position: absolute;
+            border-radius: 50%;
             background: transparent;
+            border: 3px solid rgba(255, 255, 245, 0.5);
+            width: 0;
+            height: 0;
+            left: 30%;
+            top: 40%;
+            transform: translate(-50%, -50%);
+            animation: rippleExpand 12s infinite ease-out;
+            box-shadow: 0 0 0 2px rgba(240, 230, 200, 0.2);
         }
 
-        /* 卡片样式：完全直角 */
-        .month-card {
-            max-width: 1100px;
+        .wave-circle:nth-child(1) {
+            animation-delay: 0s;
+            border-width: 4px;
+            border-color: rgba(255, 235, 190, 0.6);
+        }
+        .wave-circle:nth-child(2) {
+            animation-delay: 3s;
+            border-width: 3px;
+            border-color: rgba(210, 180, 140, 0.7);
+        }
+        .wave-circle:nth-child(3) {
+            animation-delay: 6s;
+            border-width: 5px;
+            border-color: rgba(255, 215, 140, 0.5);
+        }
+        .wave-circle:nth-child(4) {
+            animation-delay: 9s;
+            border-width: 2px;
+            border-color: rgba(200, 170, 110, 0.6);
+        }
+
+        @keyframes rippleExpand {
+            0% {
+                width: 0px;
+                height: 0px;
+                opacity: 0.8;
+            }
+            40% {
+                opacity: 0.6;
+            }
+            100% {
+                width: 120vw;
+                height: 120vw;
+                opacity: 0;
+            }
+        }
+
+        /* 额外飘逸波浪线 (粗线条动画) */
+        .line-waves {
+            position: fixed;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            background: rgba(255, 252, 245, 0.92);
-            border-radius: 0px;
-            box-shadow: 0 20px 35px -8px rgba(0,0,0,0.25);
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: 1px solid rgba(255, 240, 220, 0.6);
-        }
-        .month-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 28px 40px -12px rgba(0,0,0,0.3);
-            background: rgba(255, 252, 245, 0.96);
-        }
-
-        /* 月份头部：只显示年份+月份，移除了右上角日期范围 */
-        .month-head {
-            padding: 1.2rem 2rem 0.6rem 2rem;
-            border-bottom: 1px solid rgba(110, 44, 47, 0.3);
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        .month-year {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.9rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: #2a241e;
-        }
-        .month-year small {
-            font-size: 0.9rem;
-            font-weight: 400;
-            color: #9b7e64;
-            margin-left: 8px;
-        }
-        /* 隐藏日期范围标签 */
-        .month-tag {
-            display: none;
+            height: 180px;
+            background: repeating-linear-gradient(105deg, 
+                transparent, 
+                transparent 38px, 
+                rgba(255, 250, 210, 0.35) 38px, 
+                rgba(255, 240, 180, 0.5) 46px,
+                transparent 46px,
+                transparent 80px);
+            pointer-events: none;
+            z-index: 1;
+            transform: skewY(-2deg);
+            animation: slideWave 14s linear infinite;
         }
 
-        /* 照片轮播区域 - 完全直角 */
-        .photo-slider {
-            padding: 1rem 1rem 0.6rem;
+        @keyframes slideWave {
+            0% { background-position: 0 0; }
+            100% { background-position: 200px 80px; }
         }
-        .slider-frame {
+
+        /* ================= 主容器 (z-index提升) ================= */
+        .archive {
             position: relative;
-            background: rgba(245, 238, 228, 0.3);
-            border-radius: 0px;
-            overflow: hidden;
-        }
-        .slider-track {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            gap: 0;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .slider-track::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .slide-item {
-            flex: 0 0 100%;
-            scroll-snap-align: start;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(248, 242, 234, 0.2);
-            min-height: 420px;
-            max-height: 68vh;
-        }
-        .slide-item img {
-            width: auto;
-            height: 100%;
-            max-height: 68vh;
-            object-fit: contain;
-            display: block;
+            z-index: 10;
+            max-width: 1400px;
             margin: 0 auto;
-            cursor: pointer;
-            border-radius: 0px;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+            padding: 1.5rem 2rem 3rem;
         }
-        .slider-arrows {
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            transform: translateY(-50%);
-            display: flex;
-            justify-content: space-between;
-            padding: 0 12px;
+
+        /* 左上角大标题 — 只保留 PHOTO */
+        .main-title {
+            position: fixed;
+            top: 2rem;
+            left: 2.5rem;
+            z-index: 30;
+            font-family: 'Helvetica Neue', '黑体', 'Arial Black', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #f0ede8;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            background: none;
+            backdrop-filter: blur(2px);
             pointer-events: none;
         }
-        .slider-arrow {
-            pointer-events: auto;
-            width: 42px;
-            height: 42px;
-            background: rgba(255, 248, 238, 0.95);
-            border-radius: 0px;
+
+        /* 月份导航栏：横向并列，无边框无背景，纯文本大写字重 */
+        .months-nav {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 0.8rem;
+            margin: 0 0 1.5rem 0;
+            padding-top: 0.5rem;
+            border: none;
+            background: transparent;
+        }
+        .month-btn {
+            background: transparent;
+            border: none;
+            font-family: 'Helvetica Neue', '黑体', 'Arial Black', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #f2efe0;
+            text-transform: uppercase;
             cursor: pointer;
-            font-size: 1.4rem;
-            color: #4c3d30;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: 0.2s;
-            border: 1px solid rgba(110, 44, 47, 0.4);
+            padding: 0.3rem 0.6rem;
+            transition: all 0.2s ease;
+            border-radius: 0;
+            opacity: 0.75;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
         }
-        .slider-arrow:hover {
-            background: #6e2c2f;
-            color: #f5e6d8;
-            border-color: #6e2c2f;
+        .month-btn:hover {
+            opacity: 1;
+            color: #ffdd99;
+            transform: translateY(-2px);
         }
-        
-        /* 描述区域 */
-        .photo-description {
-            text-align: center;
-            font-size: 0.85rem;
-            padding: 0.6rem 1rem 0.8rem;
-            color: #2c241e;
-            font-style: italic;
-            letter-spacing: 0.3px;
-            border-top: 1px dashed rgba(110, 44, 47, 0.35);
-            margin-top: 4px;
-            background: rgba(250, 245, 238, 0.5);
-        }
-        .slider-dots {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0 0.4rem;
-        }
-        .dot-slide {
-            width: 7px;
-            height: 7px;
-            border-radius: 0px;
-            background: #b09a82;
-            transition: 0.2s;
-            cursor: pointer;
-        }
-        .dot-slide.active {
-            width: 24px;
-            background: #6e2c2f;
-        }
-        
-        /* 完全移除底部寄语区域 */
-        .month-footnote {
-            display: none;
+        .month-btn.active {
+            opacity: 1;
+            color: #ffc285;
+            border-bottom: 2.5px solid #ffb347;
+            font-weight: 900;
         }
 
-        /* 年份目录 直角风 */
-        .year-directory {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 200;
-            font-family: 'Inter', sans-serif;
-        }
-        .year-trigger {
-            background: rgba(255, 248, 238, 0.96);
-            border-radius: 0px;
-            padding: 0.5rem 1.2rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            cursor: pointer;
-            border: 1px solid #6e2c2f;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-            color: #1e2f3a;
-        }
-        .year-trigger:hover {
-            background: #003153;
-            color: #f5e2cf;
-            border-color: #003153;
-        }
-        .year-panel {
-            position: absolute;
-            top: 58px;
-            right: 0;
-            background: rgba(255, 252, 245, 0.98);
-            border-radius: 0px;
-            box-shadow: 0 20px 35px -5px rgba(0,0,0,0.3);
-            width: 210px;
-            padding: 1rem 0.6rem;
-            border: 1px solid #6e2c2f;
+        /* 照片网格区域 — 无边框无圆角，悬浮，不带白边 */
+        .photos-grid {
             display: none;
-            flex-direction: column;
-            gap: 0.5rem;
-            max-height: 380px;
-            overflow-y: auto;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 2rem 1.5rem;
+            margin-top: 2rem;
+            animation: fadeUp 0.4s ease;
         }
-        .year-panel.show {
-            display: flex;
-        }
-        .year-item {
-            text-align: center;
-            padding: 0.6rem 0;
-            border-radius: 0px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: 0.15s;
-            color: #2c241e;
-            letter-spacing: 1px;
-        }
-        .year-item:hover {
-            background: #003153;
-            color: #fef0e2;
-        }
-        .year-item.active-year {
-            background: #6e2c2f;
-            color: #fff5ea;
-            font-weight: 600;
+        .photos-grid.active-grid {
+            display: grid;
         }
 
-        /* 音乐播放器 直角 */
-        .music-corner {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 46px;
-            height: 46px;
+        /* 每个照片项：彻底无边框，无白边，悬浮阴影细腻 */
+        .photo-item {
+            background: transparent;     /* 完全无背景 */
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border: none;
             border-radius: 0px;
-            background: rgba(255, 248, 238, 0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            border: 1px solid #003153;
-            color: #4c2e24;
-            font-size: 1.2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            transition: 0.2s;
+            box-shadow: none;
         }
-        .music-corner.playing {
-            background: #6e2c2f;
-            color: #fbead8;
-            border-color: #d4af37;
+        .photo-item:hover {
+            transform: translateY(-6px);
+            filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.2));
         }
-        
-        /* 键盘提示已完全移除 */
-        .key-hint {
-            display: none;
-        }
-        
-        @media (max-width: 680px) {
-            .month-head { padding: 1rem 1rem 0.4rem; }
-            .slide-item { min-height: 320px; }
-            .slide-item img { max-height: 58vh; }
-            .year-trigger { padding: 0.3rem 1rem; font-size: 0.7rem; }
-            .year-panel { width: 170px; right: 0; }
-            .slider-arrow { width: 32px; height: 32px; font-size: 1rem; }
-        }
-        .full-img-overlay {
-            position: fixed;
-            top:0;left:0;width:100%;height:100%;
-            background: rgba(0, 0, 0, 0.88);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            cursor: pointer;
-        }
-        .full-img-overlay img {
-            max-width: 90%;
-            max-height: 90%;
+        /* 照片本身无任何边框 / 白边 */
+        .photo-img {
+            width: 100%;
+            aspect-ratio: 4 / 3;
             object-fit: contain;
-            border-radius: 0px;
-            border: 3px solid #d4af37;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            display: block;
+            background: transparent;      /* 彻底透明背景, 不产生白边 */
+            border: none;
+            outline: none;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            transition: 0.2s;
+        }
+        .photo-caption {
+            padding: 0.6rem 0 0.2rem;
+            font-size: 0.78rem;
+            text-align: center;
+            color: #f2e8da;
+            font-weight: 500;
+            background: transparent;
+            letter-spacing: 1px;
+            opacity: 0.85;
+        }
+
+        /* 空月份优雅占位 */
+        .empty-album {
+            text-align: center;
+            padding: 2.5rem;
+            font-size: 1.1rem;
+            color: #ccddee;
+            font-weight: 500;
+            background: rgba(10, 35, 50, 0.55);
+            backdrop-filter: blur(4px);
+            border-left: 4px solid #ffbe76;
+        }
+
+        /* 简洁箭头 (无多余文字) */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            margin: 2rem 0 1rem;
+        }
+        .arrow-nav {
+            width: 44px;
+            height: 44px;
+            background: rgba(30, 55, 70, 0.7);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 230, 180, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffefcf;
+        }
+        .arrow-nav:hover {
+            background: #b96f30;
+            border-color: #ffd58c;
+            transform: scale(1.02);
+        }
+
+        /* 模态框 (大图无边框) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(8, 28, 40, 0.96);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .modal-img {
+            max-width: 85%;
+            max-height: 85%;
+            border: none;
+            background: transparent;
+            box-shadow: 0 0 0 2px rgba(255, 210, 120, 0.5);
+        }
+        .modal-caption {
+            margin-top: 1rem;
+            color: #fae6c3;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 0.3rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .close-modal-icon {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-size: 1.8rem;
+            color: #f3e3ca;
+            background: rgba(0, 0, 0, 0.4);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #dfb87a;
+        }
+        .close-modal-icon:hover {
+            background: #b3512a;
+            border-color: #ffe0aa;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 响应式缩小标题与间距 */
+        @media (max-width: 820px) {
+            .main-title { font-size: 2rem; top: 1.2rem; left: 1.5rem; }
+            .archive { padding: 1rem; }
+            .photos-grid { gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .month-btn { font-size: 0.7rem; padding: 0.2rem 0.4rem; }
+            .months-nav { justify-content: flex-end; gap: 0.4rem; margin-top: 0.8rem; }
         }
     </style>
 </head>
 <body>
 
-<!-- 撞色背景层 -->
-<div class="art-bg">
-    <div class="block-prussian"></div>
-    <div class="block-burgundy"></div>
-    <div class="block-mustard"></div>
-    <div class="block-terracotta"></div>
-    <div class="block-darkgreen"></div>
+<!-- 普鲁士蓝基底同心圆波浪动画层 -->
+<div class="ripple-bg">
+    <div class="wave-circle"></div>
+    <div class="wave-circle"></div>
+    <div class="wave-circle"></div>
+    <div class="wave-circle"></div>
 </div>
+<div class="line-waves"></div>
 
-<div class="scroll-container" id="scrollContainer">
-    <!-- 动态月份卡片 -->
-</div>
+<div class="archive">
+    <!-- 左上角大标题只保留 PHOTO -->
+    <div class="main-title">PHOTO</div>
 
-<div class="year-directory">
-    <div class="year-trigger" id="yearTrigger">
-        年份目录 <span id="currentYearBadge">2026</span>
+    <!-- 月份导航：无边框无背景，纯并列文字 -->
+    <div class="months-nav" id="monthsNav"></div>
+
+    <!-- 照片网格容器 -->
+    <div id="photoGridContainer" class="photos-grid"></div>
+
+    <!-- 极简切换箭头，不带额外文字提示 -->
+    <div class="nav-buttons">
+        <div class="arrow-nav" id="prevMonthBtn">←</div>
+        <div class="arrow-nav" id="nextMonthBtn">→</div>
     </div>
-    <div class="year-panel" id="yearPanel"></div>
 </div>
 
-<div class="music-corner" id="musicBtn">🎵</div>
+<!-- 模态框大图预览 -->
+<div id="modalOverlay" class="modal-overlay">
+    <div class="close-modal-icon" id="closeModalBtn">✕</div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <img class="modal-img" id="enlargedImg" src="" alt="照片">
+        <div id="modalCaptionText" class="modal-caption"></div>
+    </div>
+</div>
 
 <script>
-    // ======================= 十年数据 2026-2035 =======================
-    const START_YEAR = 2026;
-    const END_YEAR = 2035;
-    const MONTH_NAMES = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
-    const MONTH_EN = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-    
-    // ========== 照片路径函数 ==========
-    // 照片存放规则：images/年份/月份/序号.jpg  (月份两位01-12, 序号从1开始)
-    function getPhotoUrl(year, monthIndex, photoIndex) {
-        const monthFolder = String(monthIndex + 1).padStart(2, '0');
-        // 请根据实际照片存放位置修改此处路径前缀
-        return `images/${year}/${monthFolder}/${photoIndex + 1}.jpg`;
-    }
-    
-    // 图片加载失败时的占位图
-    function setImageWithFallback(imgElement, url) {
-        imgElement.src = url;
-        imgElement.onerror = function() {
-            this.src = 'https://placehold.co/1000x700/2c3e50/e6c8a8?text=禾禾成长瞬间';
-            this.alt = '照片待更新';
-        };
-    }
-    
-    // ========== 照片描述 (可随意修改每张照片的文字) ==========
-    function getPhotoCaption(year, monthIndex, photoIndex) {
-        // 特殊日期自定义描述
-        if (year === 2026 && monthIndex === 0 && photoIndex === 0) return "初遇世界 · 普鲁士蓝下的初见";
-        if (year === 2026 && monthIndex === 0 && photoIndex === 1) return "大手牵小手，温暖如酒红";
-        if (year === 2026 && monthIndex === 0 && photoIndex === 2) return "第一次微笑，融化心房";
-        if (year === 2026 && monthIndex === 0 && photoIndex === 3) return "满月纪念，爱意流淌";
-        if (year === 2027 && monthIndex === 0 && photoIndex === 0) return "周岁礼 · 撞色童话宴";
-        if (year === 2027 && monthIndex === 0 && photoIndex === 1) return "生日蛋糕，甜梦启航";
-        if (year === 2030 && monthIndex === 8 && photoIndex === 0) return "幼儿园第一天，勇敢小禾禾";
-        if (year === 2035 && monthIndex === 11 && photoIndex === 2) return "十年陪伴 · 爱依然炽热";
-        
-        const themes = ["成长印记", "闪亮瞬间", "探索奇遇", "欢声笑语", "温暖定格", "勇敢时刻", "纯真年代"];
-        const idx = (year + monthIndex + photoIndex) % themes.length;
-        return `${year}年${monthIndex+1}月 · ${themes[idx]}`;
-    }
-    
-    // 生成每月照片数组
-    function generatePhotosForMonth(year, monthIndex) {
-        let photoCount = 2 + ((year + monthIndex) % 3);
-        if (year === 2026 && monthIndex === 0) photoCount = 4;
-        if (year === 2035 && monthIndex === 11) photoCount = 5;
-        const photos = [];
-        for (let p = 0; p < photoCount; p++) {
-            const url = getPhotoUrl(year, monthIndex, p);
-            const caption = getPhotoCaption(year, monthIndex, p);
-            photos.push({ url, caption });
-        }
-        return photos;
-    }
-    
-    // 构建全量数据 (不再需要 milestone)
-    const yearsData = new Map();
-    for (let y = START_YEAR; y <= END_YEAR; y++) {
-        const monthsOfYear = [];
-        for (let m = 0; m < 12; m++) {
-            const photos = generatePhotosForMonth(y, m);
-            monthsOfYear.push({
-                year: y,
-                monthIndex: m,
-                monthName: MONTH_NAMES[m],
-                monthEn: MONTH_EN[m],
-                photos: photos
-            });
-        }
-        yearsData.set(y, monthsOfYear);
+    // ============================================================
+    // 照片数据 (2026年1-12月，每张照片独立url与描述)
+    // 无边框无白边设计，照片使用 contain 确保不裁切
+    // ============================================================
+    const monthsData = [
+        { monthNum: 1, nameEn: "JANUARY", photos: [ { url: "https://picsum.photos/id/13/600/450", caption: "元旦晨光" }, { url: "https://picsum.photos/id/15/600/450", caption: "森林雪语" } ] },
+        { monthNum: 2, nameEn: "FEBRUARY", photos: [ { url: "https://picsum.photos/id/20/600/450", caption: "情人节絮语" }, { url: "https://picsum.photos/id/26/600/450", caption: "烟火人间" }, { url: "https://picsum.photos/id/28/600/450", caption: "围炉夜" } ] },
+        { monthNum: 3, nameEn: "MARCH", photos: [ { url: "https://picsum.photos/id/96/600/450", caption: "樱吹雪" } ] },
+        { monthNum: 4, nameEn: "APRIL", photos: [ { url: "https://picsum.photos/id/29/600/450", caption: "细雨呢喃" } ] },
+        { monthNum: 5, nameEn: "MAY", photos: [ { url: "https://picsum.photos/id/169/600/450", caption: "远足山海" }, { url: "https://picsum.photos/id/42/600/450", caption: "海岸晚风" } ] },
+        { monthNum: 6, nameEn: "JUNE", photos: [ { url: "https://picsum.photos/id/30/600/450", caption: "童梦气球" } ] },
+        { monthNum: 7, nameEn: "JULY", photos: [ { url: "https://picsum.photos/id/59/600/450", caption: "盛夏冰语" } ] },
+        { monthNum: 8, nameEn: "AUGUST", photos: [ { url: "https://picsum.photos/id/47/600/450", caption: "山野星辰" } ] },
+        { monthNum: 9, nameEn: "SEPTEMBER", photos: [ { url: "https://picsum.photos/id/34/600/450", caption: "桂香满径" } ] },
+        { monthNum: 10, nameEn: "OCTOBER", photos: [ { url: "https://picsum.photos/id/29/600/450", caption: "银杏金箔" } ] },
+        { monthNum: 11, nameEn: "NOVEMBER", photos: [ { url: "https://picsum.photos/id/64/600/450", caption: "深秋炉火" } ] },
+        { monthNum: 12, nameEn: "DECEMBER", photos: [ { url: "https://picsum.photos/id/91/600/450", caption: "圣诞颂歌" }, { url: "https://picsum.photos/id/100/600/450", caption: "跨年星火" } ] }
+    ];
+
+    // DOM 元素
+    const monthsNav = document.getElementById('monthsNav');
+    const photoGridContainer = document.getElementById('photoGridContainer');
+    const prevBtn = document.getElementById('prevMonthBtn');
+    const nextBtn = document.getElementById('nextMonthBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const enlargedImg = document.getElementById('enlargedImg');
+    const modalCaptionText = document.getElementById('modalCaptionText');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    let currentMonthIndex = 0;
+
+    // 渲染月份导航 (无边框，无背景，并列)
+    function renderNav() {
+        monthsNav.innerHTML = '';
+        monthsData.forEach((month, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'month-btn';
+            btn.textContent = month.nameEn;   // 全大写
+            if (idx === currentMonthIndex) btn.classList.add('active');
+            btn.addEventListener('click', () => setActiveMonth(idx));
+            monthsNav.appendChild(btn);
+        });
     }
 
-    let currentYear = 2026;
-    let currentMonthIdx = 0;
-    const scrollContainer = document.getElementById('scrollContainer');
-    let isScrollingProgram = false;
+    // 渲染照片网格 (完全无边框无白边)
+    function renderPhotos() {
+        const currentMonth = monthsData[currentMonthIndex];
+        const photos = currentMonth.photos;
+        photoGridContainer.innerHTML = '';
+        photoGridContainer.classList.add('active-grid');
 
-    // 渲染当前年份的12个月份 (完全无底部寄语，无日期标签)
-    function renderYearMonths() {
-        if (!scrollContainer) return;
-        const monthsArray = yearsData.get(currentYear);
-        if (!monthsArray) return;
-        scrollContainer.innerHTML = '';
-        
-        monthsArray.forEach((month, idx) => {
-            const screen = document.createElement('section');
-            screen.className = 'month-screen';
-            screen.setAttribute('data-month-idx', idx);
-            screen.setAttribute('data-year', currentYear);
-            // 不再显示 month-tag 日期范围
-            screen.innerHTML = `
-                <div class="month-card">
-                    <div class="month-head">
-                        <div class="month-year">${currentYear} · ${month.monthName}<small>${month.monthEn}</small></div>
-                    </div>
-                    <div class="photo-slider">
-                        <div class="slider-frame">
-                            <div class="slider-track" id="track-${currentYear}-${idx}"></div>
-                            <div class="slider-arrows">
-                                <div class="slider-arrow slider-prev" data-year="${currentYear}" data-monthidx="${idx}">←</div>
-                                <div class="slider-arrow slider-next" data-year="${currentYear}" data-monthidx="${idx}">→</div>
-                            </div>
-                        </div>
-                        <div class="slider-dots" id="dots-${currentYear}-${idx}"></div>
-                        <div class="photo-description" id="desc-${currentYear}-${idx}">✨ 珍藏此刻 ✨</div>
-                    </div>
-                </div>
-            `;
-            scrollContainer.appendChild(screen);
-        });
-        
-        monthsArray.forEach((month, idx) => {
-            initSliderForMonth(currentYear, idx, month.photos);
-        });
-        
-        setTimeout(() => {
-            scrollToMonthByIndex(currentMonthIdx);
-            updateYearBadgeAndPanel();
-        }, 80);
-    }
-    
-    // 初始化轮播 (滚动条隐藏)
-    function initSliderForMonth(year, monthIdx, photos) {
-        const track = document.getElementById(`track-${year}-${monthIdx}`);
-        const dotsContainer = document.getElementById(`dots-${year}-${monthIdx}`);
-        const descElem = document.getElementById(`desc-${year}-${monthIdx}`);
-        if (!track) return;
-        track.innerHTML = '';
-        if (dotsContainer) dotsContainer.innerHTML = '';
-        if (!photos.length) {
-            track.innerHTML = '<div class="slide-item" style="justify-content:center; color:#aaa;">📸 等待美好瞬间</div>';
-            if(descElem) descElem.innerText = '即将收录';
+        if (!photos || photos.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'empty-album';
+            emptyDiv.textContent = '✨ 此刻静默 · 待光影 ✨';
+            photoGridContainer.appendChild(emptyDiv);
             return;
         }
-        const photoCaptions = photos.map(p => p.caption);
-        photos.forEach((photo, pIdx) => {
-            const slideDiv = document.createElement('div');
-            slideDiv.className = 'slide-item';
+
+        photos.forEach(photo => {
+            const card = document.createElement('div');
+            card.className = 'photo-item';
             const img = document.createElement('img');
-            setImageWithFallback(img, photo.url);
-            img.alt = `${year}年${monthIdx+1}月影像`;
+            img.src = photo.url;
+            img.alt = photo.caption;
+            img.className = 'photo-img';
             img.loading = 'lazy';
-            img.addEventListener('click', (e) => {
+            const captionSpan = document.createElement('div');
+            captionSpan.className = 'photo-caption';
+            captionSpan.textContent = photo.caption;
+            card.appendChild(img);
+            card.appendChild(captionSpan);
+            card.addEventListener('click', (e) => {
                 e.stopPropagation();
-                showFullImage(img.src);
+                openModal(photo.url, photo.caption);
             });
-            slideDiv.appendChild(img);
-            track.appendChild(slideDiv);
-            
-            const dot = document.createElement('div');
-            dot.className = 'dot-slide';
-            if (pIdx === 0) dot.classList.add('active');
-            dot.addEventListener('click', () => {
-                scrollToPhotoInMonth(year, monthIdx, pIdx, photoCaptions, descElem, dotsContainer);
-            });
-            if(dotsContainer) dotsContainer.appendChild(dot);
-        });
-        if(descElem && photoCaptions[0]) descElem.innerText = photoCaptions[0];
-        
-        const prevBtn = document.querySelector(`.slider-prev[data-year="${year}"][data-monthidx="${monthIdx}"]`);
-        const nextBtn = document.querySelector(`.slider-next[data-year="${year}"][data-monthidx="${monthIdx}"]`);
-        const handlePrev = () => {
-            let curr = getCurrentPhotoIndexInMonth(year, monthIdx);
-            let newIdx = (curr - 1 + photos.length) % photos.length;
-            scrollToPhotoInMonth(year, monthIdx, newIdx, photoCaptions, descElem, dotsContainer);
-        };
-        const handleNext = () => {
-            let curr = getCurrentPhotoIndexInMonth(year, monthIdx);
-            let newIdx = (curr + 1) % photos.length;
-            scrollToPhotoInMonth(year, monthIdx, newIdx, photoCaptions, descElem, dotsContainer);
-        };
-        if(prevBtn) {
-            prevBtn.replaceWith?.(prevBtn.cloneNode(true));
-            const newPrev = document.querySelector(`.slider-prev[data-year="${year}"][data-monthidx="${monthIdx}"]`);
-            if(newPrev) newPrev.addEventListener('click', handlePrev);
-        }
-        if(nextBtn) {
-            nextBtn.replaceWith?.(nextBtn.cloneNode(true));
-            const newNext = document.querySelector(`.slider-next[data-year="${year}"][data-monthidx="${monthIdx}"]`);
-            if(newNext) newNext.addEventListener('click', handleNext);
-        }
-        
-        track.addEventListener('scroll', () => {
-            const scrollLeft = track.scrollLeft;
-            let nearest = 0;
-            for (let i = 0; i < track.children.length; i++) {
-                const child = track.children[i];
-                const childCenter = child.offsetLeft + child.offsetWidth/2;
-                if (scrollLeft + track.offsetWidth/2 >= childCenter) nearest = i;
-            }
-            updateDotsActiveForMonth(year, monthIdx, nearest);
-            if(descElem && photoCaptions[nearest]) descElem.innerText = photoCaptions[nearest];
+            photoGridContainer.appendChild(card);
         });
     }
-    
-    function getCurrentPhotoIndexInMonth(year, monthIdx) {
-        const track = document.getElementById(`track-${year}-${monthIdx}`);
-        if(!track) return 0;
-        const scrollLeft = track.scrollLeft;
-        for(let i=0; i<track.children.length; i++) {
-            const child = track.children[i];
-            const leftEdge = child.offsetLeft;
-            const rightEdge = leftEdge + child.offsetWidth;
-            if(scrollLeft + track.offsetWidth/2 >= leftEdge && scrollLeft + track.offsetWidth/2 <= rightEdge) return i;
-        }
-        return 0;
-    }
-    
-    function scrollToPhotoInMonth(year, monthIdx, photoIndex, captionsArr, descElem, dotsContainer) {
-        const track = document.getElementById(`track-${year}-${monthIdx}`);
-        if(!track || !track.children[photoIndex]) return;
-        track.scrollTo({ left: track.children[photoIndex].offsetLeft, behavior: 'smooth' });
-        if(descElem && captionsArr && captionsArr[photoIndex]) descElem.innerText = captionsArr[photoIndex];
-        updateDotsActiveForMonth(year, monthIdx, photoIndex);
-    }
-    
-    function updateDotsActiveForMonth(year, monthIdx, activeIdx) {
-        const dotsContainer = document.getElementById(`dots-${year}-${monthIdx}`);
-        if(!dotsContainer) return;
-        const dots = dotsContainer.querySelectorAll('.dot-slide');
-        dots.forEach((dot, i) => {
-            if(i === activeIdx) dot.classList.add('active');
-            else dot.classList.remove('active');
+
+    function setActiveMonth(index) {
+        if (index === currentMonthIndex) return;
+        currentMonthIndex = index;
+        // 更新按钮样式
+        const btns = document.querySelectorAll('.month-btn');
+        btns.forEach((btn, i) => {
+            if (i === currentMonthIndex) btn.classList.add('active');
+            else btn.classList.remove('active');
         });
+        renderPhotos();
+        photoGridContainer.style.animation = 'none';
+        setTimeout(() => { photoGridContainer.style.animation = 'fadeUp 0.35s ease'; }, 10);
     }
-    
-    function showFullImage(src) {
-        const overlay = document.createElement('div');
-        overlay.className = 'full-img-overlay';
-        const img = document.createElement('img');
-        img.src = src;
-        overlay.appendChild(img);
-        overlay.onclick = () => overlay.remove();
-        document.body.appendChild(overlay);
+
+    function nextMonth() { let n = (currentMonthIndex + 1) % monthsData.length; setActiveMonth(n); }
+    function prevMonth() { let p = (currentMonthIndex - 1 + monthsData.length) % monthsData.length; setActiveMonth(p); }
+
+    // 模态框
+    function openModal(url, caption) {
+        enlargedImg.src = url;
+        modalCaptionText.textContent = caption || '光影瞬间';
+        modalOverlay.style.display = 'flex';
     }
-    
-    function scrollToMonthByIndex(monthIndex) {
-        const targetScreen = document.querySelector(`.month-screen[data-month-idx="${monthIndex}"]`);
-        if (targetScreen) {
-            isScrollingProgram = true;
-            targetScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            setTimeout(() => { isScrollingProgram = false; }, 500);
-            currentMonthIdx = monthIndex;
-            updateYearBadgeAndPanel();
+    function closeModal() { modalOverlay.style.display = 'none'; }
+
+    // 键盘与箭头监听
+    document.addEventListener('keydown', (e) => {
+        if (modalOverlay.style.display === 'flex') {
+            if (e.key === 'Escape') closeModal();
+            return;
         }
-    }
-    
-    function bindScrollSync() {
-        scrollContainer.addEventListener('scroll', () => {
-            if (isScrollingProgram) return;
-            const screens = document.querySelectorAll('.month-screen');
-            if (!screens.length) return;
-            const scrollTop = scrollContainer.scrollTop;
-            let closestIndex = 0;
-            for (let i = 0; i < screens.length; i++) {
-                const offsetTop = screens[i].offsetTop;
-                if (offsetTop <= scrollTop + 100) closestIndex = i;
-                else break;
-            }
-            if (closestIndex !== currentMonthIdx) {
-                currentMonthIdx = closestIndex;
-                updateYearBadgeAndPanel();
-            }
-        });
-    }
-    
-    function updateYearBadgeAndPanel() {
-        document.getElementById('currentYearBadge').innerText = currentYear;
-        const yearItems = document.querySelectorAll('.year-item');
-        yearItems.forEach(item => {
-            const y = parseInt(item.getAttribute('data-year'));
-            if (y === currentYear) item.classList.add('active-year');
-            else item.classList.remove('active-year');
-        });
-    }
-    
-    function switchToYear(year) {
-        if (year === currentYear) return;
-        currentYear = year;
-        currentMonthIdx = 0;
-        renderYearMonths();
-        bindScrollSync();
-    }
-    
-    function buildYearPanel() {
-        const panel = document.getElementById('yearPanel');
-        panel.innerHTML = '';
-        for (let y = START_YEAR; y <= END_YEAR; y++) {
-            const yearDiv = document.createElement('div');
-            yearDiv.className = 'year-item';
-            yearDiv.textContent = y;
-            yearDiv.setAttribute('data-year', y);
-            yearDiv.addEventListener('click', (e) => {
-                e.stopPropagation();
-                switchToYear(y);
-                document.getElementById('yearPanel').classList.remove('show');
-            });
-            panel.appendChild(yearDiv);
-        }
-    }
-    
-    // 年份目录交互
-    const yearTrigger = document.getElementById('yearTrigger');
-    const yearPanelDiv = document.getElementById('yearPanel');
-    yearTrigger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        yearPanelDiv.classList.toggle('show');
+        if (e.key === 'ArrowLeft') prevMonth();
+        if (e.key === 'ArrowRight') nextMonth();
     });
-    document.addEventListener('click', (e) => {
-        if (!yearTrigger.contains(e.target) && !yearPanelDiv.contains(e.target)) {
-            yearPanelDiv.classList.remove('show');
-        }
-    });
-    
-    // 键盘控制 (上下切换月份，左右切换照片，功能保留但不显示提示)
-    function handleKeyboard(e) {
-        const key = e.key;
-        if (key === 'ArrowUp') { e.preventDefault(); if (currentMonthIdx > 0) scrollToMonthByIndex(currentMonthIdx - 1); }
-        else if (key === 'ArrowDown') { e.preventDefault(); if (currentMonthIdx + 1 < 12) scrollToMonthByIndex(currentMonthIdx + 1); }
-        else if (key === 'ArrowLeft') {
-            e.preventDefault();
-            const monthData = yearsData.get(currentYear)?.[currentMonthIdx];
-            if (monthData?.photos.length) {
-                const desc = document.getElementById(`desc-${currentYear}-${currentMonthIdx}`);
-                const dots = document.getElementById(`dots-${currentYear}-${currentMonthIdx}`);
-                const captions = monthData.photos.map(p => p.caption);
-                let currIdx = getCurrentPhotoIndexInMonth(currentYear, currentMonthIdx);
-                let newIdx = (currIdx - 1 + monthData.photos.length) % monthData.photos.length;
-                scrollToPhotoInMonth(currentYear, currentMonthIdx, newIdx, captions, desc, dots);
-            }
-        } else if (key === 'ArrowRight') {
-            e.preventDefault();
-            const monthData = yearsData.get(currentYear)?.[currentMonthIdx];
-            if (monthData?.photos.length) {
-                const desc = document.getElementById(`desc-${currentYear}-${currentMonthIdx}`);
-                const dots = document.getElementById(`dots-${currentYear}-${currentMonthIdx}`);
-                const captions = monthData.photos.map(p => p.caption);
-                let currIdx = getCurrentPhotoIndexInMonth(currentYear, currentMonthIdx);
-                let newIdx = (currIdx + 1) % monthData.photos.length;
-                scrollToPhotoInMonth(currentYear, currentMonthIdx, newIdx, captions, desc, dots);
-            }
-        }
-    }
-    document.addEventListener('keydown', handleKeyboard);
-    
-    // 音乐播放器
-    const musicBtn = document.getElementById('musicBtn');
-    let audio = null, musicPlaying = false;
-    musicBtn.addEventListener('click', () => {
-        if (!audio) {
-            audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
-            audio.loop = true;
-            audio.volume = 0.2;
-        }
-        if (musicPlaying) {
-            audio.pause();
-            musicBtn.classList.remove('playing');
-            musicBtn.innerHTML = '🎵';
-        } else {
-            audio.play().catch(e => console.log('交互后播放'));
-            musicBtn.classList.add('playing');
-            musicBtn.innerHTML = '🎶';
-        }
-        musicPlaying = !musicPlaying;
-    });
-    
-    function init() {
-        buildYearPanel();
-        renderYearMonths();
-        bindScrollSync();
-        scrollToMonthByIndex(0);
-    }
-    init();
+    prevBtn.addEventListener('click', prevMonth);
+    nextBtn.addEventListener('click', nextMonth);
+    closeModalBtn.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+
+    // 初始化
+    renderNav();
+    renderPhotos();
 </script>
 </body>
 </html>
