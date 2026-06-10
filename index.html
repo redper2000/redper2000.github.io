@@ -85,7 +85,7 @@
             color: white;
         }
 
-        /* ========== 多照片轮播区域 ========== */
+        /* ========== 多照片轮播区域 (保留原始比例，统一高度，黑边) ========== */
         .hero-carousel {
             background: #ffffff;
             box-shadow: 0 8px 24px rgba(0,0,0,0.04);
@@ -95,7 +95,7 @@
         }
         .carousel-container {
             position: relative;
-            overflow: hidden;
+            background: #0a0a0a;  /* 黑边背景色 */
         }
         .carousel-track {
             display: flex;
@@ -104,6 +104,7 @@
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
+            background: #0a0a0a;
         }
         .carousel-track::-webkit-scrollbar {
             height: 4px;
@@ -111,14 +112,24 @@
         .carousel-slide {
             flex: 0 0 100%;
             scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* 固定轮播区域高度 */
+            height: 60vh;
+            min-height: 400px;
+            max-height: 600px;
+            background: #0a0a0a;
         }
         .carousel-slide img {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            object-fit: cover;
+            height: 100%;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;   /* 保持原始比例，不裁剪 */
             display: block;
+            margin: 0 auto;
         }
-        /* 轮播指示器（点） */
+        /* 指示点 */
         .carousel-dots {
             display: flex;
             justify-content: center;
@@ -140,7 +151,7 @@
             width: 20px;
             border-radius: 4px;
         }
-        /* 左右箭头（轮播内） */
+        /* 左右箭头 */
         .carousel-arrow {
             position: absolute;
             top: 50%;
@@ -192,7 +203,7 @@
             font-size: 0.75rem;
         }
 
-        /* 时间轴（同之前） */
+        /* 时间轴 */
         .timeline {
             margin: 2rem 0;
         }
@@ -357,6 +368,7 @@
             .month-pill { flex: 0 0 60px; }
             .hero-caption { flex-direction: column; align-items: flex-start; }
             .carousel-arrow { width: 32px; height: 32px; font-size: 0.9rem; }
+            .carousel-slide { height: 50vh; min-height: 300px; }
         }
     </style>
 </head>
@@ -438,7 +450,6 @@
             name: "二月", en: "FEBRUARY", abbr: "FEB", date: "02.01 — 02.28", credit: "二月啦",
             photos: [
                  "images/months/feb-1.jpg"
-
             ]
         },
         { 
@@ -476,21 +487,20 @@
     const prevArrow = document.getElementById('prevArrow');
     const nextArrow = document.getElementById('nextArrow');
 
-    let currentIndex = 0;      // 当前月份索引
-    let currentPhotoIndex = 0;  // 当前照片索引（在轮播中）
-    let currentPhotos = [];      // 当前月份的照片列表
+    let currentIndex = 0;
+    let currentPhotoIndex = 0;
+    let currentPhotos = [];
 
     // 轮播滚动容器
     const track = carouselTrack;
 
     // 更新轮播内容
     function updateCarousel(photos) {
-        // 清空并重新生成轮播内容
         track.innerHTML = '';
         carouselDots.innerHTML = '';
         
         if (!photos || photos.length === 0) {
-            track.innerHTML = '<div class="carousel-slide" style="display:flex;align-items:center;justify-content:center;min-height:300px;">暂无照片</div>';
+            track.innerHTML = '<div class="carousel-slide" style="display:flex;align-items:center;justify-content:center;min-height:300px;color:#888;">暂无照片</div>';
             return;
         }
         
@@ -501,7 +511,6 @@
             img.src = photo;
             img.alt = `照片 ${idx + 1}`;
             img.loading = 'lazy';
-            // 点击放大预览
             img.addEventListener('click', (e) => {
                 e.stopPropagation();
                 openFullscreen(photo);
@@ -509,7 +518,6 @@
             slide.appendChild(img);
             track.appendChild(slide);
             
-            // 生成指示点
             const dot = document.createElement('div');
             dot.className = 'dot';
             if (idx === currentPhotoIndex) dot.classList.add('active');
@@ -517,12 +525,9 @@
             carouselDots.appendChild(dot);
         });
         
-        // 重置滚动位置
         if (track.children.length > 0) {
             track.scrollTo({ left: 0, behavior: 'auto' });
         }
-        
-        // 更新指示点激活状态
         updateDotsActive();
     }
     
@@ -540,7 +545,6 @@
         });
     }
     
-    // 监听轮播滚动，同步指示点
     track.addEventListener('scroll', () => {
         const scrollLeft = track.scrollLeft;
         let nearestIndex = 0;
@@ -557,7 +561,6 @@
         }
     });
     
-    // 轮播箭头
     carouselPrev.addEventListener('click', () => {
         if (currentPhotoIndex > 0) {
             scrollToPhoto(currentPhotoIndex - 1);
@@ -573,7 +576,6 @@
         }
     });
     
-    // 全屏预览
     function openFullscreen(src) {
         const overlay = document.createElement('div');
         overlay.style.position = 'fixed';
@@ -597,31 +599,23 @@
         document.body.appendChild(overlay);
     }
     
-    // 更新整个页面（切换月份）
     function updateMonth(index) {
         const data = monthsData[index];
         currentPhotos = data.photos || [];
         currentPhotoIndex = 0;
-        
-        // 更新轮播
         updateCarousel(currentPhotos);
-        
-        // 更新文字信息
         captionMonth.textContent = data.en;
         captionDate.textContent = data.date;
         captionCredit.textContent = data.credit;
         indicatorNum.textContent = String(index + 1).padStart(2, '0');
         indicatorName.textContent = data.name;
         
-        // 更新时间轴激活样式
         document.querySelectorAll('.month-pill').forEach((pill, i) => {
             pill.classList.toggle('active', i === index);
         });
-        
         currentIndex = index;
     }
     
-    // 切换月份
     function nextMonth() {
         let newIdx = currentIndex + 1;
         if (newIdx >= monthsData.length) newIdx = 0;
@@ -654,18 +648,15 @@
         dirGrid.appendChild(item);
     });
     
-    // 菜单事件
     menuBtn.addEventListener('click', () => fullDir.style.display = 'flex');
     closeDir.addEventListener('click', () => fullDir.style.display = 'none');
     fullDir.addEventListener('click', (e) => {
         if (e.target === fullDir) fullDir.style.display = 'none';
     });
     
-    // 箭头事件
     prevArrow.addEventListener('click', prevMonth);
     nextArrow.addEventListener('click', nextMonth);
     
-    // 键盘事件
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') prevMonth();
         if (e.key === 'ArrowRight') nextMonth();
@@ -694,7 +685,6 @@
         musicPlaying = !musicPlaying;
     });
     
-    // 初始化
     updateMonth(0);
 </script>
 </body>
