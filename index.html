@@ -105,12 +105,12 @@
             background: transparent;
         }
 
-        /* 卡片样式：更轻量，底部无多余寄语区域 */
+        /* 卡片样式：完全直角 */
         .month-card {
             max-width: 1100px;
             width: 100%;
             background: rgba(255, 252, 245, 0.92);
-            border-radius: 36px;
+            border-radius: 0px;
             box-shadow: 0 20px 35px -8px rgba(0,0,0,0.25);
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -122,6 +122,7 @@
             background: rgba(255, 252, 245, 0.96);
         }
 
+        /* 月份头部：只显示年份+月份，移除了右上角日期范围 */
         .month-head {
             padding: 1.2rem 2rem 0.6rem 2rem;
             border-bottom: 1px solid rgba(110, 44, 47, 0.3);
@@ -144,23 +145,19 @@
             color: #9b7e64;
             margin-left: 8px;
         }
+        /* 隐藏日期范围标签 */
         .month-tag {
-            font-size: 0.7rem;
-            background: rgba(0, 49, 83, 0.15);
-            padding: 0.2rem 0.9rem;
-            border-radius: 40px;
-            color: #003153;
-            font-weight: 500;
+            display: none;
         }
 
-        /* 照片轮播区域 - 最大化照片空间 */
+        /* 照片轮播区域 - 完全直角 */
         .photo-slider {
             padding: 1rem 1rem 0.6rem;
         }
         .slider-frame {
             position: relative;
             background: rgba(245, 238, 228, 0.3);
-            border-radius: 28px;
+            border-radius: 0px;
             overflow: hidden;
         }
         .slider-track {
@@ -185,17 +182,17 @@
             align-items: center;
             background: rgba(248, 242, 234, 0.2);
             min-height: 420px;
-            max-height: 65vh;
+            max-height: 68vh;
         }
         .slide-item img {
             width: auto;
             height: 100%;
-            max-height: 65vh;
+            max-height: 68vh;
             object-fit: contain;
             display: block;
             margin: 0 auto;
             cursor: pointer;
-            border-radius: 20px;
+            border-radius: 0px;
             box-shadow: 0 8px 18px rgba(0,0,0,0.1);
         }
         .slider-arrows {
@@ -213,7 +210,7 @@
             width: 42px;
             height: 42px;
             background: rgba(255, 248, 238, 0.95);
-            border-radius: 50%;
+            border-radius: 0px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -230,7 +227,7 @@
             border-color: #6e2c2f;
         }
         
-        /* 描述区域保留给每张照片专属文字 */
+        /* 描述区域 */
         .photo-description {
             text-align: center;
             font-size: 0.85rem;
@@ -251,7 +248,7 @@
         .dot-slide {
             width: 7px;
             height: 7px;
-            border-radius: 10px;
+            border-radius: 0px;
             background: #b09a82;
             transition: 0.2s;
             cursor: pointer;
@@ -261,12 +258,12 @@
             background: #6e2c2f;
         }
         
-        /* 移除了底部的 .month-footnote 以及 milestone 区域，让照片占据更大空间 */
+        /* 完全移除底部寄语区域 */
         .month-footnote {
             display: none;
         }
 
-        /* 年份目录 */
+        /* 年份目录 直角风 */
         .year-directory {
             position: fixed;
             top: 20px;
@@ -276,7 +273,7 @@
         }
         .year-trigger {
             background: rgba(255, 248, 238, 0.96);
-            border-radius: 48px;
+            border-radius: 0px;
             padding: 0.5rem 1.2rem;
             font-size: 0.85rem;
             font-weight: 600;
@@ -300,7 +297,7 @@
             top: 58px;
             right: 0;
             background: rgba(255, 252, 245, 0.98);
-            border-radius: 28px;
+            border-radius: 0px;
             box-shadow: 0 20px 35px -5px rgba(0,0,0,0.3);
             width: 210px;
             padding: 1rem 0.6rem;
@@ -317,7 +314,7 @@
         .year-item {
             text-align: center;
             padding: 0.6rem 0;
-            border-radius: 60px;
+            border-radius: 0px;
             cursor: pointer;
             font-weight: 500;
             font-size: 0.9rem;
@@ -335,14 +332,14 @@
             font-weight: 600;
         }
 
-        /* 音乐播放器 */
+        /* 音乐播放器 直角 */
         .music-corner {
             position: fixed;
             bottom: 20px;
             right: 20px;
             width: 46px;
             height: 46px;
-            border-radius: 50%;
+            border-radius: 0px;
             background: rgba(255, 248, 238, 0.95);
             display: flex;
             align-items: center;
@@ -361,32 +358,17 @@
             border-color: #d4af37;
         }
         
-        /* 键盘提示 */
+        /* 键盘提示已完全移除 */
         .key-hint {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            font-size: 0.6rem;
-            color: #f2e4d8;
-            background: rgba(0, 49, 83, 0.7);
-            backdrop-filter: blur(4px);
-            padding: 5px 14px;
-            border-radius: 40px;
-            z-index: 99;
-            letter-spacing: 0.5px;
-            pointer-events: none;
-            font-weight: 500;
-            border-left: 3px solid #d4af37;
+            display: none;
         }
         
         @media (max-width: 680px) {
-            .month-card { border-radius: 24px; }
             .month-head { padding: 1rem 1rem 0.4rem; }
             .slide-item { min-height: 320px; }
-            .slide-item img { max-height: 55vh; }
+            .slide-item img { max-height: 58vh; }
             .year-trigger { padding: 0.3rem 1rem; font-size: 0.7rem; }
             .year-panel { width: 170px; right: 0; }
-            .key-hint { font-size: 0.5rem; bottom: 12px; left: 12px; }
             .slider-arrow { width: 32px; height: 32px; font-size: 1rem; }
         }
         .full-img-overlay {
@@ -403,7 +385,7 @@
             max-width: 90%;
             max-height: 90%;
             object-fit: contain;
-            border-radius: 24px;
+            border-radius: 0px;
             border: 3px solid #d4af37;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
@@ -432,16 +414,15 @@
 </div>
 
 <div class="music-corner" id="musicBtn">🎵</div>
-<div class="key-hint">↑ ↓ 切换月份  |  ← → 切换照片</div>
 
 <script>
-    // ======================= 十年数据 2026-2035 (已去除底部寄语) =======================
+    // ======================= 十年数据 2026-2035 =======================
     const START_YEAR = 2026;
     const END_YEAR = 2035;
     const MONTH_NAMES = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
     const MONTH_EN = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
     
-    // ========== 照片路径函数 (方法一) ==========
+    // ========== 照片路径函数 ==========
     // 照片存放规则：images/年份/月份/序号.jpg  (月份两位01-12, 序号从1开始)
     function getPhotoUrl(year, monthIndex, photoIndex) {
         const monthFolder = String(monthIndex + 1).padStart(2, '0');
@@ -460,7 +441,7 @@
     
     // ========== 照片描述 (可随意修改每张照片的文字) ==========
     function getPhotoCaption(year, monthIndex, photoIndex) {
-        // 特殊日期自定义描述，您可以按需要增删
+        // 特殊日期自定义描述
         if (year === 2026 && monthIndex === 0 && photoIndex === 0) return "初遇世界 · 普鲁士蓝下的初见";
         if (year === 2026 && monthIndex === 0 && photoIndex === 1) return "大手牵小手，温暖如酒红";
         if (year === 2026 && monthIndex === 0 && photoIndex === 2) return "第一次微笑，融化心房";
@@ -470,7 +451,6 @@
         if (year === 2030 && monthIndex === 8 && photoIndex === 0) return "幼儿园第一天，勇敢小禾禾";
         if (year === 2035 && monthIndex === 11 && photoIndex === 2) return "十年陪伴 · 爱依然炽热";
         
-        // 通用描述池 (可自由增删)
         const themes = ["成长印记", "闪亮瞬间", "探索奇遇", "欢声笑语", "温暖定格", "勇敢时刻", "纯真年代"];
         const idx = (year + monthIndex + photoIndex) % themes.length;
         return `${year}年${monthIndex+1}月 · ${themes[idx]}`;
@@ -490,9 +470,7 @@
         return photos;
     }
     
-    // 不再需要 bottom milestone，留空即可
-    
-    // 构建全量数据
+    // 构建全量数据 (不再需要 milestone)
     const yearsData = new Map();
     for (let y = START_YEAR; y <= END_YEAR; y++) {
         const monthsOfYear = [];
@@ -503,7 +481,6 @@
                 monthIndex: m,
                 monthName: MONTH_NAMES[m],
                 monthEn: MONTH_EN[m],
-                dateRange: `${y}.${String(m+1).padStart(2,'0')}.01 — ${y}.${String(m+1).padStart(2,'0')}.${new Date(y, m+1, 0).getDate()}`,
                 photos: photos
             });
         }
@@ -515,7 +492,7 @@
     const scrollContainer = document.getElementById('scrollContainer');
     let isScrollingProgram = false;
 
-    // 渲染当前年份的12个月份 (底部不显示任何寄语)
+    // 渲染当前年份的12个月份 (完全无底部寄语，无日期标签)
     function renderYearMonths() {
         if (!scrollContainer) return;
         const monthsArray = yearsData.get(currentYear);
@@ -527,12 +504,11 @@
             screen.className = 'month-screen';
             screen.setAttribute('data-month-idx', idx);
             screen.setAttribute('data-year', currentYear);
-            // 完全移除了 month-footnote 区域
+            // 不再显示 month-tag 日期范围
             screen.innerHTML = `
                 <div class="month-card">
                     <div class="month-head">
                         <div class="month-year">${currentYear} · ${month.monthName}<small>${month.monthEn}</small></div>
-                        <div class="month-tag">${month.dateRange}</div>
                     </div>
                     <div class="photo-slider">
                         <div class="slider-frame">
@@ -753,7 +729,7 @@
         }
     });
     
-    // 键盘控制
+    // 键盘控制 (上下切换月份，左右切换照片，功能保留但不显示提示)
     function handleKeyboard(e) {
         const key = e.key;
         if (key === 'ArrowUp') { e.preventDefault(); if (currentMonthIdx > 0) scrollToMonthByIndex(currentMonthIdx - 1); }
