@@ -8,367 +8,82 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f5f2ef; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; color: #2c2a28; }
+        .archive { max-width: 1400px; margin: 0 auto; padding: 1rem 1.5rem 2rem; }
+        .header { text-align: center; margin-bottom: 1.5rem; border-bottom: 1px solid #e2ddd6; padding-bottom: 0.75rem; }
+        .header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 400; letter-spacing: 4px; color: #3a3530; }
+        .header p { font-size: 0.7rem; letter-spacing: 2px; color: #9b8f82; margin-top: 0.25rem; text-transform: uppercase; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+        .month-indicator { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: #b8a281; letter-spacing: 2px; }
+        .month-indicator span { font-size: 1.5rem; color: #2c2a28; font-weight: 600; }
+        .menu-btn { background: none; border: 1px solid #ddd5cc; padding: 0.4rem 1rem; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; border-radius: 30px; color: #5c554b; transition: 0.2s; }
+        .menu-btn:hover { background: #2c2a28; border-color: #2c2a28; color: white; }
 
-        body {
-            background: #f5f2ef;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            color: #2c2a28;
-        }
+        /* 轮播样式 */
+        .hero-carousel { background: #fff; box-shadow: 0 8px 24px rgba(0,0,0,0.04); margin-bottom: 1rem; border: 1px solid #eae4dc; position: relative; }
+        .carousel-container { position: relative; background: #f5f2ef; }
+        .carousel-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; scrollbar-width: thin; background: #f5f2ef; }
+        .carousel-track::-webkit-scrollbar { height: 4px; }
+        .carousel-slide { flex: 0 0 100%; scroll-snap-align: start; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 42vh; min-height: 280px; max-height: 480px; background: #f5f2ef; }
+        .carousel-slide img { height: 100%; width: auto; max-width: 100%; object-fit: contain; display: block; margin: 0 auto; }
+        .carousel-dots { display: flex; justify-content: center; gap: 0.5rem; padding: 0.5rem; background: #fff; border-top: 1px solid #f0ebe4; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #ddd5cc; cursor: pointer; transition: 0.2s; }
+        .dot.active { background: #b8a281; width: 20px; border-radius: 4px; }
+        .carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; background: rgba(255,255,255,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 1rem; color: #5c554b; }
+        .carousel-arrow-left { left: 12px; }
+        .carousel-arrow-right { right: 12px; }
+        .carousel-arrow:hover { background: #2c2a28; color: white; }
 
-        .archive {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem 4rem;
-        }
-
-        .header {
+        /* 照片独立描述区域 */
+        .photo-caption {
             text-align: center;
-            margin-bottom: 3rem;
-            border-bottom: 1px solid #e2ddd6;
-            padding-bottom: 1.5rem;
-        }
-        .header h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 3rem;
-            font-weight: 400;
-            letter-spacing: 4px;
-            color: #3a3530;
-        }
-        .header p {
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            color: #9b8f82;
-            margin-top: 0.5rem;
-            text-transform: uppercase;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .month-indicator {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.2rem;
-            color: #b8a281;
-            letter-spacing: 2px;
-        }
-        .month-indicator span {
-            font-size: 1.8rem;
-            color: #2c2a28;
-            font-weight: 600;
-        }
-        .menu-btn {
-            background: none;
-            border: 1px solid #ddd5cc;
-            padding: 0.5rem 1.2rem;
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #5c554b;
-            border-radius: 30px;
-        }
-        .menu-btn:hover {
-            background: #2c2a28;
-            border-color: #2c2a28;
-            color: white;
-        }
-
-        /* ========== 多照片轮播区域 (保留原始比例，统一高度，黑边) ========== */
-        .hero-carousel {
-            background: #ffffff;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
-            margin-bottom: 2rem;
-            border: 1px solid #eae4dc;
-            position: relative;
-        }
-        .carousel-container {
-            position: relative;
-            background: #0a0a0a;  /* 黑边背景色 */
-        }
-        .carousel-track {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            background: #0a0a0a;
-        }
-        .carousel-track::-webkit-scrollbar {
-            height: 4px;
-        }
-        .carousel-slide {
-            flex: 0 0 100%;
-            scroll-snap-align: start;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            /* 固定轮播区域高度 */
-            height: 60vh;
-            min-height: 400px;
-            max-height: 600px;
-            background: #0a0a0a;
-        }
-        .carousel-slide img {
-            height: 100%;
-            width: auto;
-            max-width: 100%;
-            object-fit: contain;   /* 保持原始比例，不裁剪 */
-            display: block;
-            margin: 0 auto;
-        }
-        /* 指示点 */
-        .carousel-dots {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            background: #ffffff;
-            border-top: 1px solid #f0ebe4;
-        }
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #ddd5cc;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .dot.active {
-            background: #b8a281;
-            width: 20px;
-            border-radius: 4px;
-        }
-        /* 左右箭头 */
-        .carousel-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.8);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 10;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            font-size: 1.2rem;
-            color: #5c554b;
-        }
-        .carousel-arrow-left { left: 16px; }
-        .carousel-arrow-right { right: 16px; }
-        .carousel-arrow:hover {
-            background: #2c2a28;
-            color: white;
-        }
-
-        .hero-caption {
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            border-top: 1px solid #f0ebe4;
-            font-size: 0.8rem;
-            color: #7f766b;
-        }
-        .hero-caption-left {
-            display: flex;
-            gap: 1rem;
-            align-items: baseline;
-        }
-        .hero-month {
-            font-weight: 600;
-            color: #b8a281;
-            text-transform: uppercase;
             font-size: 0.7rem;
-            letter-spacing: 1px;
+            color: #7f766b;
+            margin-top: 0.5rem;
+            padding: 0 0.5rem;
+            max-width: 90%;
+            white-space: normal;
+            word-break: break-word;
         }
-        .hero-desc {
-            font-size: 0.75rem;
-        }
+
+        .hero-caption { padding: 0.6rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-top: 1px solid #f0ebe4; font-size: 0.7rem; color: #7f766b; }
+        .hero-caption-left { display: flex; gap: 0.8rem; align-items: baseline; }
+        .hero-month { font-weight: 600; color: #b8a281; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; }
+        .hero-desc { font-size: 0.65rem; }
 
         /* 时间轴 */
-        .timeline {
-            margin: 2rem 0;
-        }
-        .timeline-label {
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            color: #b8a281;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-        }
-        .months-scroll {
-            display: flex;
-            gap: 0.6rem;
-            overflow-x: auto;
-            padding-bottom: 0.5rem;
-            scrollbar-width: thin;
-        }
-        .month-pill {
-            flex: 0 0 70px;
-            text-align: center;
-            padding: 0.6rem 0;
-            background: #ffffff;
-            border: 1px solid #e8e0d8;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-radius: 40px;
-        }
-        .month-pill.active {
-            background: #2c2a28;
-            border-color: #2c2a28;
-            color: white;
-        }
-        .month-pill .num { font-weight: 500; font-size: 0.9rem; }
-        .month-pill .name { font-size: 0.65rem; opacity: 0.7; margin-top: 2px; }
+        .timeline { margin: 0.5rem 0 0.25rem; }
+        .timeline-label { font-size: 0.6rem; letter-spacing: 2px; color: #b8a281; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .months-scroll { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem; }
+        .month-pill { flex: 0 0 60px; text-align: center; padding: 0.4rem 0; background: #fff; border: 1px solid #e8e0d8; cursor: pointer; border-radius: 40px; transition: 0.2s; }
+        .month-pill.active { background: #2c2a28; border-color: #2c2a28; color: white; }
+        .month-pill .num { font-weight: 500; font-size: 0.8rem; }
+        .month-pill .name { font-size: 0.55rem; opacity: 0.7; margin-top: 2px; }
         .month-pill.active .name { opacity: 1; }
         .month-pill:hover { border-color: #b8a281; transform: translateY(-2px); }
+        .nav-arrows { display: flex; justify-content: center; gap: 0.8rem; margin-top: 0.75rem; }
+        .arrow { width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 1px solid #e2d9d0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 1rem; color: #5c554b; }
+        .arrow:hover { background: #2c2a28; border-color: #2c2a28; color: white; }
+        .footer-note { text-align: center; margin-top: 1.5rem; font-size: 0.6rem; color: #b1a79b; letter-spacing: 1px; border-top: 1px solid #e8e2db; padding-top: 1rem; }
 
-        .nav-arrows {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        .arrow {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 1px solid #e2d9d0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 1.2rem;
-            color: #5c554b;
-        }
-        .arrow:hover {
-            background: #2c2a28;
-            border-color: #2c2a28;
-            color: white;
-        }
-
-        .footer-note {
-            text-align: center;
-            margin-top: 3rem;
-            font-size: 0.7rem;
-            color: #b1a79b;
-            letter-spacing: 1px;
-            border-top: 1px solid #e8e2db;
-            padding-top: 2rem;
-        }
-
-        /* 全屏目录 */
-        .fullscreen-dir {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #fefaf7;
-            z-index: 1000;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Cormorant Garamond', serif;
-        }
-        .dir-container {
-            max-width: 800px;
-            width: 90%;
-            text-align: center;
-        }
-        .dir-header {
-            font-size: 2.5rem;
-            letter-spacing: 4px;
-            color: #3a3530;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid #e2ddd6;
-            display: inline-block;
-            padding-bottom: 0.5rem;
-        }
-        .dir-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 1rem;
-        }
-        .dir-item {
-            background: white;
-            border: 1px solid #e2d9d0;
-            padding: 1rem;
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: center;
-        }
-        .dir-item:hover {
-            background: #2c2a28;
-            border-color: #2c2a28;
-            color: white;
-        }
-        .dir-item .cn { font-size: 1.2rem; font-weight: 500; }
-        .dir-item .en { font-size: 0.7rem; text-transform: uppercase; color: #9b8f82; margin-top: 4px; }
-        .dir-item:hover .en { color: #ccc; }
-        .close-dir {
-            position: absolute;
-            top: 2rem;
-            right: 2rem;
-            font-size: 1.5rem;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: #7f766b;
-        }
-        .close-dir:hover { color: #000; }
-
-        .music-player {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(255,255,240,0.9);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            font-size: 1.2rem;
-            border: 1px solid #e2d9d0;
-            color: #5c554b;
-        }
-        .music-player.playing {
-            background: #2c2a28;
-            color: #f0e6d2;
-            border-color: #2c2a28;
-        }
-
+        /* 全屏目录简化 */
+        .fullscreen-dir { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fefaf7; z-index: 1000; display: none; flex-direction: column; justify-content: center; align-items: center; font-family: 'Cormorant Garamond', serif; }
+        .dir-container { max-width: 800px; width: 90%; text-align: center; }
+        .dir-header { font-size: 2rem; letter-spacing: 4px; color: #3a3530; margin-bottom: 1.5rem; border-bottom: 1px solid #e2ddd6; display: inline-block; padding-bottom: 0.5rem; }
+        .dir-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.8rem; }
+        .dir-item { background: white; border: 1px solid #e2d9d0; padding: 0.8rem; cursor: pointer; transition: 0.2s; text-align: center; }
+        .dir-item:hover { background: #2c2a28; border-color: #2c2a28; color: white; }
+        .dir-item .cn { font-size: 1rem; font-weight: 500; }
+        .dir-item .en { font-size: 0.65rem; text-transform: uppercase; color: #9b8f82; margin-top: 4px; }
+        .close-dir { position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1.3rem; cursor: pointer; background: none; border: none; color: #7f766b; }
+        .music-player { position: fixed; bottom: 20px; right: 20px; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,240,0.9); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; font-size: 1.1rem; border: 1px solid #e2d9d0; color: #5c554b; }
+        .music-player.playing { background: #2c2a28; color: #f0e6d2; border-color: #2c2a28; }
         @media (max-width: 640px) {
-            .archive { padding: 1rem; }
-            .month-pill { flex: 0 0 60px; }
-            .hero-caption { flex-direction: column; align-items: flex-start; }
-            .carousel-arrow { width: 32px; height: 32px; font-size: 0.9rem; }
-            .carousel-slide { height: 50vh; min-height: 300px; }
+            .archive { padding: 0.8rem; }
+            .carousel-slide { height: 38vh; min-height: 240px; max-height: 400px; }
+            .month-pill { flex: 0 0 55px; }
+            .carousel-arrow { width: 30px; height: 30px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -387,7 +102,6 @@
         <button class="menu-btn" id="menuBtn">月份目录</button>
     </div>
 
-    <!-- 多照片轮播区 -->
     <div class="hero-carousel" id="heroCarousel">
         <div class="carousel-container">
             <div class="carousel-track" id="carouselTrack"></div>
@@ -395,6 +109,8 @@
             <div class="carousel-arrow carousel-arrow-right" id="carouselNext">→</div>
         </div>
         <div class="carousel-dots" id="carouselDots"></div>
+        <!-- 独立的照片描述栏 -->
+        <div class="photo-caption" id="photoCaption">✨ 每张照片都有自己的故事 ✨</div>
         <div class="hero-caption">
             <div class="hero-caption-left">
                 <span class="hero-month" id="captionMonth">JANUARY</span>
@@ -404,9 +120,8 @@
         </div>
     </div>
 
-    <!-- 月份时间轴 -->
     <div class="timeline">
-        <div class="timeline-label">⟡ 时间轴 · 点击切换 ⟡</div>
+        <div class="timeline-label"></div>
         <div class="months-scroll" id="monthsScroll"></div>
         <div class="nav-arrows">
             <div class="arrow" id="prevArrow">←</div>
@@ -432,41 +147,40 @@
 
 <script>
     // ============================================================
-    // 多照片数据配置
-    // 【照片替换指南】每个月份可以添加任意多张照片
-    // 照片路径：建议放在 images/months/月份/ 文件夹下
+    // 【修改点1】照片数据结构：每张照片包含 url 和独立的 caption
+    // 您可以根据需要修改每张照片的描述文字
     // ============================================================
     const monthsData = [
         { 
-            name: "一月", en: "JANUARY", abbr: "JAN", date: "01.01 — 01.31", credit: "我出生啦",
+            name: "一月", en: "JANUARY", abbr: "JAN", date: "01.01 — 01.31", credit: "2026 开篇",
             photos: [
-                "images/months/jan-1.jpg",
-                "images/months/jan-back.jpg",
-                "images/months/jan-left.jpg",
-                "images/months/jan-right.jpg"
+                { url: "images/months/jan-1.jpg", caption: "我出生啦！第一次睁开眼看世界 👶" },
+                { url: "images/months/jan-back.jpg", caption: "在妈妈怀里甜甜入睡 🥰" },
+                { url: "images/months/jan-left.jpg", caption: "小手握住爸爸的手指 🖐️" },
+                { url: "images/months/jan-right.jpg", caption: "满月照，可爱多 🌙" }
             ]
         },
         { 
-            name: "二月", en: "FEBRUARY", abbr: "FEB", date: "02.01 — 02.28", credit: "二月啦",
+            name: "二月", en: "FEBRUARY", abbr: "FEB", date: "02.01 — 02.28", credit: "二月春风",
             photos: [
-                 "images/months/feb-.jpg"
+                { url: "images/months/feb-1.jpg", caption: "第一次抬头，努力锻炼" }
             ]
         },
         { 
-            name: "三月", en: "MARCH", abbr: "MAR", date: "03.01 — 03.31", credit: "三月啦",
+            name: "三月", en: "MARCH", abbr: "MAR", date: "03.01 — 03.31", credit: "春暖花开",
             photos: [
-                "images/months/mar-.jpg"
+                { url: "images/months/mar-1.jpg", caption: "学会翻身，活力满满" }
             ]
         },
-        { name: "四月", en: "APRIL", abbr: "APR", date: "04.01 — 04.30", credit: "四月啦", photos: [ "images/months/apr-.jpg"] },
-        { name: "五月", en: "MAY", abbr: "MAY", date: "05.01 — 05.31", credit: "五月啦", photos: ["images/months/may-.jpg"] },
-        { name: "六月", en: "JUNE", abbr: "JUN", date: "06.01 — 06.30", credit: "六月啦", photos: ["https://picsum.photos/id/30/1200/800"] },
-        { name: "七月", en: "JULY", abbr: "JUL", date: "07.01 — 07.31", credit: "七月啦", photos: ["https://picsum.photos/id/155/1200/800"] },
-        { name: "八月", en: "AUGUST", abbr: "AUG", date: "08.01 — 08.31", credit: "八月啦", photos: ["https://picsum.photos/id/22/1200/800"] },
-        { name: "九月", en: "SEPTEMBER", abbr: "SEP", date: "09.01 — 09.30", credit: "九月啦", photos: ["https://picsum.photos/id/104/1200/800"] },
-        { name: "十月", en: "OCTOBER", abbr: "OCT", date: "10.01 — 10.31", credit: "十月啦", photos: ["https://picsum.photos/id/116/1200/800"] },
-        { name: "十一月", en: "NOVEMBER", abbr: "NOV", date: "11.01 — 11.30", credit: "十一月啦", photos: ["https://picsum.photos/id/127/1200/800"] },
-        { name: "十二月", en: "DECEMBER", abbr: "DEC", date: "12.01 — 12.31", credit: "十二月啦", photos: ["https://picsum.photos/id/142/1200/800"] }
+        { name: "四月", en: "APRIL", abbr: "APR", date: "04.01 — 04.30", credit: "人间四月", photos: [ { url: "images/months/apr-1.jpg", caption: "第一次笑出声" } ] },
+        { name: "五月", en: "MAY", abbr: "MAY", date: "05.01 — 05.31", credit: "初夏", photos: [ { url: "images/months/may-1.jpg", caption: "学会坐立" } ] },
+        { name: "六月", en: "JUNE", abbr: "JUN", date: "06.01 — 06.30", credit: "盛夏", photos: [ { url: "https://picsum.photos/id/30/1200/800", caption: "尝试辅食" } ] },
+        { name: "七月", en: "JULY", abbr: "JUL", date: "07.01 — 07.31", credit: "热烈", photos: [ { url: "https://picsum.photos/id/155/1200/800", caption: "学爬小能手" } ] },
+        { name: "八月", en: "AUGUST", abbr: "AUG", date: "08.01 — 08.31", credit: "丰收", photos: [ { url: "https://picsum.photos/id/22/1200/800", caption: "第一次叫妈妈" } ] },
+        { name: "九月", en: "SEPTEMBER", abbr: "SEP", date: "09.01 — 09.30", credit: "秋意", photos: [ { url: "https://picsum.photos/id/104/1200/800", caption: "扶站练习" } ] },
+        { name: "十月", en: "OCTOBER", abbr: "OCT", date: "10.01 — 10.31", credit: "金秋", photos: [ { url: "https://picsum.photos/id/116/1200/800", caption: "迈出第一步" } ] },
+        { name: "十一月", en: "NOVEMBER", abbr: "NOV", date: "11.01 — 11.30", credit: "初冬", photos: [ { url: "https://picsum.photos/id/127/1200/800", caption: "第一个生日预告" } ] },
+        { name: "十二月", en: "DECEMBER", abbr: "DEC", date: "12.01 — 12.31", credit: "岁末", photos: [ { url: "https://picsum.photos/id/142/1200/800", caption: "周岁快乐！" } ] }
     ];
 
     // DOM 元素
@@ -486,65 +200,72 @@
     const closeDir = document.getElementById('closeDir');
     const prevArrow = document.getElementById('prevArrow');
     const nextArrow = document.getElementById('nextArrow');
+    const photoCaptionElem = document.getElementById('photoCaption'); // 独立描述栏
 
     let currentIndex = 0;
     let currentPhotoIndex = 0;
-    let currentPhotos = [];
-
-    // 轮播滚动容器
+    let currentPhotos = []; // 存储当前月份的照片对象数组 {url, caption}
     const track = carouselTrack;
 
-    // 更新轮播内容
+    // 更新轮播内容 (接受照片对象数组)
     function updateCarousel(photos) {
         track.innerHTML = '';
         carouselDots.innerHTML = '';
-        
         if (!photos || photos.length === 0) {
-            track.innerHTML = '<div class="carousel-slide" style="display:flex;align-items:center;justify-content:center;min-height:300px;color:#888;">暂无照片</div>';
+            track.innerHTML = '<div class="carousel-slide" style="display:flex;align-items:center;justify-content:center;color:#888;">暂无照片</div>';
+            photoCaptionElem.textContent = '✨ 暂无照片描述 ✨';
             return;
         }
-        
-        photos.forEach((photo, idx) => {
+        photos.forEach((photoObj, idx) => {
             const slide = document.createElement('div');
             slide.className = 'carousel-slide';
             const img = document.createElement('img');
-            img.src = photo;
-            img.alt = `照片 ${idx + 1}`;
+            img.src = photoObj.url;
+            img.alt = photoObj.caption;
             img.loading = 'lazy';
             img.addEventListener('click', (e) => {
                 e.stopPropagation();
-                openFullscreen(photo);
+                openFullscreen(photoObj.url);
             });
             slide.appendChild(img);
+            // 不再在slide内加描述，因为描述统一放在底部独立栏
             track.appendChild(slide);
-            
+
             const dot = document.createElement('div');
             dot.className = 'dot';
             if (idx === currentPhotoIndex) dot.classList.add('active');
             dot.addEventListener('click', () => scrollToPhoto(idx));
             carouselDots.appendChild(dot);
         });
-        
         if (track.children.length > 0) {
             track.scrollTo({ left: 0, behavior: 'auto' });
         }
         updateDotsActive();
+        // 更新当前照片的描述
+        updatePhotoCaption();
     }
-    
+
+    function updatePhotoCaption() {
+        if (currentPhotos.length > 0 && currentPhotos[currentPhotoIndex]) {
+            photoCaptionElem.textContent = currentPhotos[currentPhotoIndex].caption;
+        } else {
+            photoCaptionElem.textContent = '✨ 等待照片加载 ✨';
+        }
+    }
+
     function scrollToPhoto(index) {
         if (!track.children[index]) return;
         track.scrollTo({ left: track.children[index].offsetLeft, behavior: 'smooth' });
         currentPhotoIndex = index;
         updateDotsActive();
+        updatePhotoCaption();   // 切换时更新描述
     }
-    
+
     function updateDotsActive() {
         const dots = document.querySelectorAll('.dot');
-        dots.forEach((dot, i) => {
-            dot.classList.toggle('active', i === currentPhotoIndex);
-        });
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === currentPhotoIndex));
     }
-    
+
     track.addEventListener('scroll', () => {
         const scrollLeft = track.scrollLeft;
         let nearestIndex = 0;
@@ -558,9 +279,10 @@
         if (nearestIndex !== currentPhotoIndex) {
             currentPhotoIndex = nearestIndex;
             updateDotsActive();
+            updatePhotoCaption();   // 滚动时更新描述
         }
     });
-    
+
     carouselPrev.addEventListener('click', () => {
         if (currentPhotoIndex > 0) {
             scrollToPhoto(currentPhotoIndex - 1);
@@ -575,30 +297,20 @@
             scrollToPhoto(0);
         }
     });
-    
+
     function openFullscreen(src) {
         const overlay = document.createElement('div');
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.background = 'rgba(0,0,0,0.85)';
-        overlay.style.display = 'flex';
-        overlay.style.alignItems = 'center';
-        overlay.style.justifyContent = 'center';
-        overlay.style.zIndex = '2000';
-        overlay.style.cursor = 'pointer';
-        const bigImg = document.createElement('img');
-        bigImg.src = src;
-        bigImg.style.maxWidth = '85%';
-        bigImg.style.maxHeight = '85%';
-        bigImg.style.borderRadius = '8px';
-        overlay.appendChild(bigImg);
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:2000;cursor:pointer';
+        const img = document.createElement('img');
+        img.src = src;
+        img.style.maxWidth = '85%';
+        img.style.maxHeight = '85%';
+        img.style.borderRadius = '8px';
+        overlay.appendChild(img);
         overlay.onclick = () => overlay.remove();
         document.body.appendChild(overlay);
     }
-    
+
     function updateMonth(index) {
         const data = monthsData[index];
         currentPhotos = data.photos || [];
@@ -609,24 +321,14 @@
         captionCredit.textContent = data.credit;
         indicatorNum.textContent = String(index + 1).padStart(2, '0');
         indicatorName.textContent = data.name;
-        
-        document.querySelectorAll('.month-pill').forEach((pill, i) => {
-            pill.classList.toggle('active', i === index);
-        });
+        document.querySelectorAll('.month-pill').forEach((pill, i) => pill.classList.toggle('active', i === index));
         currentIndex = index;
+        updatePhotoCaption(); // 确保描述更新
     }
-    
-    function nextMonth() {
-        let newIdx = currentIndex + 1;
-        if (newIdx >= monthsData.length) newIdx = 0;
-        updateMonth(newIdx);
-    }
-    function prevMonth() {
-        let newIdx = currentIndex - 1;
-        if (newIdx < 0) newIdx = monthsData.length - 1;
-        updateMonth(newIdx);
-    }
-    
+
+    function nextMonth() { updateMonth((currentIndex + 1) % monthsData.length); }
+    function prevMonth() { updateMonth((currentIndex - 1 + monthsData.length) % monthsData.length); }
+
     // 构建底部时间轴
     monthsData.forEach((month, idx) => {
         const pill = document.createElement('div');
@@ -635,38 +337,29 @@
         pill.addEventListener('click', () => updateMonth(idx));
         monthsScroll.appendChild(pill);
     });
-    
     // 构建全屏目录
     monthsData.forEach((month, idx) => {
         const item = document.createElement('div');
         item.className = 'dir-item';
         item.innerHTML = `<div class="cn">${month.name}</div><div class="en">${month.en}</div>`;
-        item.addEventListener('click', () => {
-            fullDir.style.display = 'none';
-            updateMonth(idx);
-        });
+        item.addEventListener('click', () => { fullDir.style.display = 'none'; updateMonth(idx); });
         dirGrid.appendChild(item);
     });
-    
+
     menuBtn.addEventListener('click', () => fullDir.style.display = 'flex');
     closeDir.addEventListener('click', () => fullDir.style.display = 'none');
-    fullDir.addEventListener('click', (e) => {
-        if (e.target === fullDir) fullDir.style.display = 'none';
-    });
-    
+    fullDir.addEventListener('click', (e) => { if (e.target === fullDir) fullDir.style.display = 'none'; });
     prevArrow.addEventListener('click', prevMonth);
     nextArrow.addEventListener('click', nextMonth);
-    
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') prevMonth();
         if (e.key === 'ArrowRight') nextMonth();
         if (e.key === 'Escape') fullDir.style.display = 'none';
     });
-    
-    // 音乐控制
+
+    // 音乐控制（保持不变）
     const musicBtnElem = document.getElementById('musicBtn');
-    let audio = null;
-    let musicPlaying = false;
+    let audio = null, musicPlaying = false;
     musicBtnElem.addEventListener('click', () => {
         if (!audio) {
             audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
@@ -684,7 +377,7 @@
         }
         musicPlaying = !musicPlaying;
     });
-    
+
     updateMonth(0);
 </script>
 </body>
