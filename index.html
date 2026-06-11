@@ -567,16 +567,29 @@
 
     // 导航栏
     function renderNav() {
-        monthsNav.innerHTML = '';
-        monthsData.forEach((month, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'month-btn';
-            btn.textContent = month.nameEn;
-            if (idx === currentMonthIndex) btn.classList.add('active');
-            btn.addEventListener('click', () => setActiveMonth(idx));
-            monthsNav.appendChild(btn);
-        });
-    }
+    monthsNav.innerHTML = '';
+    // 只显示前6个月（索引0~5）
+    const visibleMonths = monthsData.slice(0, 6);
+    visibleMonths.forEach((month, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'month-btn';
+        btn.textContent = month.nameEn;
+        if (idx === currentMonthIndex) btn.classList.add('active');
+        btn.addEventListener('click', () => setActiveMonth(idx));
+        monthsNav.appendChild(btn);
+    });
+}
+//    function renderNav() {
+ //       monthsNav.innerHTML = '';
+ //       monthsData.forEach((month, idx) => {
+   //         const btn = document.createElement('button');
+  //          btn.className = 'month-btn';
+   //         btn.textContent = month.nameEn;
+   //         if (idx === currentMonthIndex) btn.classList.add('active');
+    //        btn.addEventListener('click', () => setActiveMonth(idx));
+    //        monthsNav.appendChild(btn);
+  //      });
+ //   }
 
     // ========= BGM控制 =========
     let isMusicPlaying = false;
