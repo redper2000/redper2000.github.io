@@ -553,15 +553,29 @@
 
     // ========= 月份切换 =========
     function setActiveMonth(index) {
-        if (index === currentMonthIndex) return;
-        currentMonthIndex = index;
-        const btns = document.querySelectorAll('.month-btn');
-        btns.forEach((btn, i) => {
-            if (i === currentMonthIndex) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-        renderScatterPhotos();
-    }
+    if (index === currentMonthIndex) return;
+    // 限制只允许0~5
+    if (index < 0) index = 0;
+    if (index >= 6) index = 5;
+    if (index === currentMonthIndex) return;
+    currentMonthIndex = index;
+    const btns = document.querySelectorAll('.month-btn');
+    btns.forEach((btn, i) => {
+        if (i === currentMonthIndex) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+    renderScatterPhotos();
+}
+    //function setActiveMonth(index) {
+    //    if (index === currentMonthIndex) return;
+    //    currentMonthIndex = index;
+    //    const btns = document.querySelectorAll('.month-btn');
+    //    btns.forEach((btn, i) => {
+    //        if (i === currentMonthIndex) btn.classList.add('active');
+    //        else btn.classList.remove('active');
+    //    });
+    //    renderScatterPhotos();
+    //}
     function nextMonth() { setActiveMonth((currentMonthIndex + 1) % monthsData.length); }
     function prevMonth() { setActiveMonth((currentMonthIndex - 1 + monthsData.length) % monthsData.length); }
 
