@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>普鲁士蓝 · 散落堆叠相册 | 丝滑放大 + BGM</title>
+    <title></title>
     <style>
         /* ================= 全局重置 & 艺术基调 ================= */
         * {
@@ -14,14 +14,14 @@
 
         body {
             font-family: 'SimHei', 'Microsoft YaHei', '黑体', 'Helvetica Neue', 'Arial', sans-serif;
-            background: #0f2a3a;  /* 普鲁士蓝深邃基底 */
+            background: #0f2a3a;
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
             touch-action: pan-y;
         }
 
-        /* ================= 普鲁士蓝同心圆波浪扩散动画 ================= */
+        /* 普鲁士蓝同心圆波浪动画 */
         .ripple-bg {
             position: fixed;
             top: 0;
@@ -81,7 +81,6 @@
             100% { background-position: 200px 80px; }
         }
 
-        /* 主容器 */
         .archive {
             position: relative;
             z-index: 10;
@@ -90,7 +89,6 @@
             padding: 1.5rem 2rem 3rem;
         }
 
-        /* 左上角大标题 PHOTO */
         .main-title {
             position: fixed;
             top: 2rem;
@@ -107,7 +105,6 @@
             pointer-events: none;
         }
 
-        /* 月份导航栏：纯文字横向排列 */
         .months-nav {
             display: flex;
             flex-wrap: wrap;
@@ -118,6 +115,7 @@
             border: none;
             background: transparent;
         }
+
         .month-btn {
             background: transparent;
             border: none;
@@ -136,22 +134,21 @@
         .month-btn:hover { opacity: 1; color: #ffdd99; transform: translateY(-2px); }
         .month-btn.active { opacity: 1; color: #ffc285; border-bottom: 2.5px solid #ffb347; font-weight: 900; }
 
-        /* ===== 核心：散落堆叠区域（自由布局） ===== */
+        /* 散落堆叠区域 */
         .scatter-area {
             position: relative;
-            min-height: 75vh;
+            min-height: 65vh;
             margin: 2rem 0 2rem;
             transition: all 0.2s ease;
         }
 
-        /* 每张照片卡片：绝对定位，随机散落，带轻微旋转和阴影，营造堆叠感 */
         .scatter-photo {
             position: absolute;
             cursor: pointer;
             transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1), z-index 0s, box-shadow 0.2s;
             will-change: transform;
-            z-index: 5;
             filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.2));
+            background: transparent;
         }
 
         .scatter-photo:hover {
@@ -164,35 +161,33 @@
             width: 100%;
             height: auto;
             display: block;
-            border: 2px solid rgba(255, 245, 210, 0.5);
-            background: rgba(20, 35, 45, 0.3);
+            border: 2px solid rgba(255, 245, 210, 0.55);
+            background: rgba(20, 35, 45, 0.2);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             transition: 0.2s;
         }
 
-        /* 照片说明小标签 */
         .scatter-caption {
             position: absolute;
-            bottom: -1.6rem;
+            bottom: -1.8rem;
             left: 0;
             right: 0;
             text-align: center;
             font-size: 0.7rem;
             color: #e9e0cf;
-            background: rgba(10, 30, 40, 0.7);
+            background: rgba(10, 30, 40, 0.75);
             backdrop-filter: blur(3px);
             padding: 0.2rem 0.4rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             pointer-events: none;
-            border-radius: 12px;
+            border-radius: 16px;
             width: fit-content;
             margin: 0 auto;
             font-weight: 500;
         }
 
-        /* 空月份提示 */
         .empty-scatter {
             position: relative;
             text-align: center;
@@ -205,7 +200,7 @@
             margin-top: 2rem;
         }
 
-        /* ========= 放大模态框 — 丝滑过渡，不模糊背景 ========= */
+        /* 模态框 */
         .photo-zoom-overlay {
             display: none;
             position: fixed;
@@ -213,7 +208,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.45);   /* 仅半透明暗色，不模糊背景 */
+            background: rgba(0, 0, 0, 0.45);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -221,9 +216,7 @@
             opacity: 0;
             transition: opacity 0.3s ease-out;
         }
-        .photo-zoom-overlay.active {
-            opacity: 1;
-        }
+        .photo-zoom-overlay.active { opacity: 1; }
 
         .zoom-card {
             position: relative;
@@ -231,17 +224,13 @@
             max-height: 85vh;
             background: rgba(0, 0, 0, 0.3);
             padding: 0.5rem;
-            border-radius: 0px;
             box-shadow: 0 25px 40px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(255, 210, 110, 0.6);
             cursor: default;
             transform: scale(0.92);
             opacity: 0;
             transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.25s ease;
         }
-        .photo-zoom-overlay.active .zoom-card {
-            transform: scale(1);
-            opacity: 1;
-        }
+        .photo-zoom-overlay.active .zoom-card { transform: scale(1); opacity: 1; }
 
         .zoom-img {
             max-width: 100%;
@@ -275,12 +264,9 @@
             border: 1px solid #ffc285;
             transition: 0.2s;
         }
-        .close-zoom:hover {
-            background: #b3512a;
-            transform: scale(1.05);
-        }
+        .close-zoom:hover { background: #b3512a; transform: scale(1.05); }
 
-        /* ========= 音乐控制按钮（无外框，右下角） ========= */
+        /* 音乐控制 */
         .music-toggle {
             position: fixed;
             bottom: 28px;
@@ -293,18 +279,11 @@
             border: none;
             outline: none;
             opacity: 0.8;
-            backdrop-filter: none;
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
-        .music-toggle:hover {
-            transform: scale(1.1);
-            opacity: 1;
-        }
-        .music-toggle:active {
-            transform: scale(0.96);
-        }
+        .music-toggle:hover { transform: scale(1.1); opacity: 1; }
+        .music-toggle:active { transform: scale(0.96); }
 
-        /* 触摸滑动提示（移至左下角，避免与音乐按钮重叠） */
         .swipe-hint {
             position: fixed;
             bottom: 24px;
@@ -317,10 +296,8 @@
             pointer-events: none;
             z-index: 20;
             backdrop-filter: blur(4px);
-            right: auto;
         }
 
-        /* 响应式 */
         @media (max-width: 820px) {
             .main-title { font-size: 2rem; top: 1.2rem; left: 1.5rem; }
             .archive { padding: 1rem 1rem 2rem; }
@@ -344,23 +321,15 @@
 <div class="archive">
     <div class="main-title">PHOTO</div>
     <div class="months-nav" id="monthsNav"></div>
-    <!-- 散落堆叠照片区域 -->
     <div id="scatterContainer" class="scatter-area"></div>
 </div>
 
 <div class="swipe-hint">← 左右滑动切换月份 →</div>
-
-<!-- 音乐控制按钮（无外框） -->
 <button class="music-toggle" id="musicToggleBtn" aria-label="播放/暂停背景音乐">🎵</button>
-
-<!-- 背景音乐元素 -->
 <audio id="bgmAudio" loop preload="auto">
-    <!-- 默认使用一个稳定、无版权的测试音乐（SoundHelix示例），用户可自行替换 src 链接 -->
     <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-    您的浏览器不支持 audio 元素。
 </audio>
 
-<!-- 放大模态框：丝滑过渡，无背景模糊 -->
 <div id="photoZoomOverlay" class="photo-zoom-overlay">
     <div class="zoom-card" id="zoomCard">
         <div class="close-zoom" id="closeZoomBtn">✕</div>
@@ -370,9 +339,9 @@
 </div>
 
 <script>
-    // ================= 照片数据 (散落堆叠效果) =================
+    // ========= 月份数据（照片列表） =========
     const monthsData = [
-        { monthNum: 1, nameEn: "JANUARY", photos: [ { url: "images/2026/01/1.jpg", caption: "家属止步" }, { url: "images/2026/01/2.jpg", caption: "出生啦" }, { url: "images/2026/01/3.jpg", caption: "伟大的妈妈" }, { url: "images/2026/01/4.jpg", caption: "嘻嘻" } , { url: "images/2026/01/5.jpg", caption: "出院啦" }, { url: "images/2026/01/6.jpg", caption: "晒晒太阳" } ] },
+        { monthNum: 1, nameEn: "JANUARY", photos: [ { url: "images/2026/01/1.jpg", caption: "家属止步" }, { url: "images/2026/01/2.jpg", caption: "出生啦" }, { url: "images/2026/01/3.jpg", caption: "伟大的妈妈" }, { url: "images/2026/01/4.jpg", caption: "嘻嘻" }, { url: "images/2026/01/5.jpg", caption: "出院啦" }, { url: "images/2026/01/6.jpg", caption: "晒晒太阳" } ] },
         { monthNum: 2, nameEn: "FEBRUARY", photos: [ { url: "https://picsum.photos/id/20/600/450", caption: "情人节絮语" }, { url: "https://picsum.photos/id/26/550/470", caption: "烟火人间" }, { url: "https://picsum.photos/id/28/620/480", caption: "围炉夜" } ] },
         { monthNum: 3, nameEn: "MARCH", photos: [ { url: "https://picsum.photos/id/96/590/430", caption: "樱吹雪" } ] },
         { monthNum: 4, nameEn: "APRIL", photos: [ { url: "https://picsum.photos/id/29/700/500", caption: "细雨呢喃" } ] },
@@ -393,54 +362,66 @@
     const zoomImg = document.getElementById('zoomImg');
     const zoomCaption = document.getElementById('zoomCaption');
     const closeZoomBtn = document.getElementById('closeZoomBtn');
-    // BGM 相关
     const bgmAudio = document.getElementById('bgmAudio');
     const musicToggle = document.getElementById('musicToggleBtn');
 
     let currentMonthIndex = 0;
     let touchStartX = 0;
-    let touchEndX = 0;
     const minSwipeDistance = 50;
 
-    // ================= 生成散落堆叠位置 (随机不重叠) =================
+    // ========= 固定布局算法：基于索引的确定性位置（螺旋分布，避免重叠，序号小的在上层） =========
+    // 参数：索引index, 总照片数total, 容器宽度cw, 容器高度ch, 照片宽度w, 照片高度h
+    // 返回 {left, top, rotate, zIndex}
+    // 算法：按索引顺序从中心向外螺旋分布，同时调整旋转角度，确保不重叠
+    function getFixedPosition(index, total, cw, ch, pw, ph) {
+        // 防止容器尺寸过小
+        const safeCw = Math.max(cw, 500);
+        const safeCh = Math.max(ch, 400);
+        // 螺旋参数：半径递增，角度递增
+        const angleStep = (Math.PI * 2) / Math.max(1, total);  // 环绕角度步长
+        const radiusStep = Math.min(safeCw, safeCh) * 0.28;    // 每圈半径增量
+        
+        // 索引0在中心偏上，之后螺旋向外
+        let radius = radiusStep * Math.sqrt(index + 0.5);
+        let angle = index * angleStep * 1.5 + (index % 3) * 0.8;
+        
+        let centerX = safeCw / 2;
+        let centerY = safeCh / 2.2;  // 整体偏上，让底部留空间给caption
+        
+        let left = centerX + radius * Math.cos(angle) - pw/2;
+        let top = centerY + radius * Math.sin(angle) * 0.7 - ph/2;  // 垂直压缩，避免超出
+        
+        // 边界修正（确保不超出容器边缘太多，保留30px边距）
+        left = Math.min(Math.max(left, 20), safeCw - pw - 20);
+        top = Math.min(Math.max(top, 20), safeCh - ph - 30);
+        
+        // 旋转角度：与半径和索引相关，保持稳定
+        let rotate = (Math.sin(index * 2.3) * 6 + Math.cos(index * 1.7) * 3).toFixed(1);
+        // zIndex：序号小的在上层（索引0最高）
+        let zIndex = total - index + 5;
+        
+        return { left, top, rotate, zIndex };
+    }
+
+    // 重新计算并设置所有照片的位置（不依赖随机数，每次结果相同）
     function repositionPhotos(photoElements, containerRect) {
         if (!containerRect || containerRect.width === 0) return;
-        let usedPositions = [];
-        photoElements.forEach((item) => {
-            const photoDiv = item.div;
-            const width = item.width;
-            let heightEstimate = width * 0.75;
-            const imgEl = photoDiv.querySelector('img');
-            if (imgEl.complete && imgEl.naturalHeight) {
-                heightEstimate = width * (imgEl.naturalHeight / imgEl.naturalWidth);
-            }
-            let attempts = 0;
-            let position;
-            let overlap = true;
-            while (overlap && attempts < 60) {
-                let left = Math.random() * (containerRect.width - width - 25);
-                let top = Math.random() * (Math.max(containerRect.height, 320) - heightEstimate - 30);
-                left = Math.max(12, left);
-                top = Math.max(12, top);
-                position = { left, top };
-                let overlapped = false;
-                for (let p of usedPositions) {
-                    const dx = Math.abs(p.left - left);
-                    const dy = Math.abs(p.top - top);
-                    if (dx < 55 && dy < 55) {
-                        overlapped = true;
-                        break;
-                    }
-                }
-                if (!overlapped) {
-                    overlap = false;
-                    usedPositions.push({ left, top, width, height: heightEstimate });
-                }
-                attempts++;
-            }
-            photoDiv.style.left = `${position.left}px`;
-            photoDiv.style.top = `${position.top}px`;
+        const cw = containerRect.width;
+        const ch = containerRect.height;
+        const total = photoElements.length;
+        // 先确保所有照片已经添加到DOM且有固定宽度（在创建时已设置）
+        photoElements.forEach((item, idx) => {
+            const div = item.div;
+            const pw = div.offsetWidth;
+            const ph = div.offsetHeight;
+            if (pw === 0 || ph === 0) return;
+            const pos = getFixedPosition(idx, total, cw, ch, pw, ph);
+            div.style.left = `${pos.left}px`;
+            div.style.top = `${pos.top}px`;
+            div.style.transform = `rotate(${pos.rotate}deg)`;
+            div.style.zIndex = pos.zIndex;
         });
+        // 计算容器高度自适应
         let maxBottom = 0;
         photoElements.forEach(item => {
             const div = item.div;
@@ -449,9 +430,10 @@
             const bottomOffset = rect.bottom - parentRect.top;
             if (bottomOffset > maxBottom) maxBottom = bottomOffset;
         });
-        scatterContainer.style.minHeight = `${Math.max(maxBottom + 80, 450)}px`;
+        scatterContainer.style.minHeight = `${Math.max(maxBottom + 80, 480)}px`;
     }
 
+    // 渲染当前月份的照片（创建固定宽度、统一样式，然后计算位置）
     function renderScatterPhotos() {
         const currentMonth = monthsData[currentMonthIndex];
         const photos = currentMonth.photos;
@@ -465,26 +447,25 @@
             return;
         }
 
+        // 根据屏幕宽度确定照片基础宽度（手机端稍小）
         const isMobile = window.innerWidth <= 760;
-        const baseWidthRange = isMobile ? [130, 190] : [190, 280];
-        const fragment = document.createDocumentFragment();
+        const baseWidth = isMobile ? 170 : 230;
         const photoElements = [];
+        const fragment = document.createDocumentFragment();
 
-        photos.forEach((photo) => {
-            const width = Math.random() * (baseWidthRange[1] - baseWidthRange[0]) + baseWidthRange[0];
+        photos.forEach((photo, idx) => {
             const photoDiv = document.createElement('div');
             photoDiv.className = 'scatter-photo';
-            photoDiv.style.width = `${width}px`;
-            const rot = (Math.random() * 13 - 5).toFixed(1);
-            photoDiv.style.transform = `rotate(${rot}deg)`;
-            photoDiv.style.zIndex = Math.floor(Math.random() * 10) + 1;
+            // 固定宽度，高度由图片比例决定
+            photoDiv.style.width = `${baseWidth}px`;
+            // 初始临时位置（避免闪动），稍后重算
+            photoDiv.style.left = '0px';
+            photoDiv.style.top = '0px';
             
             const img = document.createElement('img');
             img.src = photo.url;
             img.alt = photo.caption;
             img.className = 'scatter-img';
-            img.style.width = '100%';
-            img.style.height = 'auto';
             img.loading = 'lazy';
             
             const captionSpan = document.createElement('div');
@@ -499,52 +480,61 @@
             });
             
             fragment.appendChild(photoDiv);
-            photoElements.push({ div: photoDiv, width, photo });
+            photoElements.push({ div: photoDiv, idx });
         });
         
         scatterContainer.appendChild(fragment);
         
-        const finishLayout = () => {
+        // 等待所有图片加载完成或超时后执行布局
+        const pendingImgs = photoElements.map(p => p.div.querySelector('img'));
+        let loadedCount = 0;
+        const tryLayout = () => {
             const rect = scatterContainer.getBoundingClientRect();
             repositionPhotos(photoElements, rect);
         };
-        
-        let pendingImgs = photoElements.map(p => p.div.querySelector('img'));
-        let loadedCount = 0;
-        if (pendingImgs.length === 0) finishLayout();
-        else {
+        const checkComplete = () => {
+            loadedCount++;
+            if (loadedCount === pendingImgs.length) {
+                tryLayout();
+            }
+        };
+        if (pendingImgs.length === 0) {
+            tryLayout();
+        } else {
             pendingImgs.forEach(img => {
                 if (img.complete) {
                     loadedCount++;
                 } else {
-                    img.addEventListener('load', () => { loadedCount++; if (loadedCount === pendingImgs.length) finishLayout(); });
-                    img.addEventListener('error', () => { loadedCount++; if (loadedCount === pendingImgs.length) finishLayout(); });
+                    img.addEventListener('load', checkComplete);
+                    img.addEventListener('error', checkComplete);
                 }
             });
-            if (loadedCount === pendingImgs.length) finishLayout();
-            else setTimeout(() => { if (loadedCount !== pendingImgs.length) finishLayout(); }, 300);
+            if (loadedCount === pendingImgs.length) tryLayout();
+            else setTimeout(tryLayout, 400); // 降级：即使未加载完也尝试布局
         }
         
-        window.addEventListener('resize', () => {
+        // 窗口尺寸变化时重新计算位置（保持固定布局）
+        const resizeHandler = () => {
             if (!scatterContainer || scatterContainer.children.length === 0) return;
-            const currentPhotos = Array.from(scatterContainer.querySelectorAll('.scatter-photo')).map(div => {
-                const width = parseFloat(div.style.width);
-                return { div, width };
-            });
-            if (currentPhotos.length) repositionPhotos(currentPhotos, scatterContainer.getBoundingClientRect());
-        });
+            const currentPhotos = Array.from(scatterContainer.querySelectorAll('.scatter-photo')).map(div => ({ div }));
+            if (currentPhotos.length) {
+                const rect = scatterContainer.getBoundingClientRect();
+                repositionPhotos(currentPhotos, rect);
+            }
+        };
+        window.removeEventListener('resize', resizeHandler);
+        window.addEventListener('resize', resizeHandler);
     }
 
-    // ========= 丝滑放大功能 =========
+    // ========= 放大功能 =========
     function openZoom(url, caption) {
         zoomImg.src = url;
         zoomCaption.textContent = caption;
         zoomOverlay.style.display = 'flex';
-        zoomOverlay.offsetHeight; // 强制重绘
+        zoomOverlay.offsetHeight;
         zoomOverlay.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
-    
     function closeZoom() {
         zoomOverlay.classList.remove('active');
         const onTransitionEnd = () => {
@@ -560,8 +550,8 @@
         }, 350);
         document.body.style.overflow = '';
     }
-    
-    // ========= 月份切换逻辑 =========
+
+    // ========= 月份切换 =========
     function setActiveMonth(index) {
         if (index === currentMonthIndex) return;
         currentMonthIndex = index;
@@ -574,8 +564,8 @@
     }
     function nextMonth() { setActiveMonth((currentMonthIndex + 1) % monthsData.length); }
     function prevMonth() { setActiveMonth((currentMonthIndex - 1 + monthsData.length) % monthsData.length); }
-    
-    // 渲染导航栏
+
+    // 导航栏
     function renderNav() {
         monthsNav.innerHTML = '';
         monthsData.forEach((month, idx) => {
@@ -587,24 +577,21 @@
             monthsNav.appendChild(btn);
         });
     }
-    
-    // ========= BGM 控制 (右下角音乐符号) =========
+
+    // ========= BGM控制 =========
     let isMusicPlaying = false;
     function toggleMusic() {
         if (isMusicPlaying) {
             bgmAudio.pause();
-            musicToggle.textContent = '🔇';   // 静音符号表示关闭
+            musicToggle.textContent = '🔇';
             isMusicPlaying = false;
         } else {
-            // 播放音乐，处理浏览器自动播放策略
             const playPromise = bgmAudio.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     musicToggle.textContent = '🎵';
                     isMusicPlaying = true;
-                }).catch(err => {
-                    console.warn('音频播放失败，可能是浏览器策略限制，请手动再次点击', err);
-                    // 播放失败时图标不变，保持静音状态
+                }).catch(() => {
                     musicToggle.textContent = '🔇';
                     isMusicPlaying = false;
                 });
@@ -614,12 +601,10 @@
             }
         }
     }
-    
-    // 初始化音乐按钮（默认静音状态，用户首次点击才播放，符合交互）
-    bgmAudio.volume = 0.5;   // 设置音量为50%
+    bgmAudio.volume = 0.5;
     musicToggle.addEventListener('click', toggleMusic);
-    
-    // 键盘与触摸控制
+
+    // ========= 交互事件 =========
     document.addEventListener('keydown', (e) => {
         if (zoomOverlay.style.display === 'flex') {
             if (e.key === 'Escape') closeZoom();
@@ -628,28 +613,25 @@
         if (e.key === 'ArrowLeft') { e.preventDefault(); prevMonth(); }
         if (e.key === 'ArrowRight') { e.preventDefault(); nextMonth(); }
     });
-    
     function handleTouchStart(e) {
         if (zoomOverlay.style.display === 'flex') return;
         touchStartX = e.changedTouches[0].screenX;
     }
     function handleTouchEnd(e) {
         if (zoomOverlay.style.display === 'flex') return;
-        touchEndX = e.changedTouches[0].screenX;
-        const deltaX = touchEndX - touchStartX;
-        if (Math.abs(deltaX) > minSwipeDistance) {
-            if (deltaX > 0) prevMonth();
+        const delta = e.changedTouches[0].screenX - touchStartX;
+        if (Math.abs(delta) > minSwipeDistance) {
+            if (delta > 0) prevMonth();
             else nextMonth();
         }
         touchStartX = 0;
     }
     document.body.addEventListener('touchstart', handleTouchStart, { passive: false });
     document.body.addEventListener('touchend', handleTouchEnd);
-    
     closeZoomBtn.addEventListener('click', closeZoom);
     zoomOverlay.addEventListener('click', (e) => { if (e.target === zoomOverlay) closeZoom(); });
-    
-    // 初始化页面
+
+    // 初始化
     renderNav();
     setActiveMonth(0);
 </script>
