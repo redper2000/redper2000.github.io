@@ -576,8 +576,18 @@
     //    });
     //    renderScatterPhotos();
     //}
-    function nextMonth() { setActiveMonth((currentMonthIndex + 1) % monthsData.length); }
-    function prevMonth() { setActiveMonth((currentMonthIndex - 1 + monthsData.length) % monthsData.length); }
+    //function nextMonth() { setActiveMonth((currentMonthIndex + 1) % monthsData.length); }
+    //function prevMonth() { setActiveMonth((currentMonthIndex - 1 + monthsData.length) % monthsData.length); }
+    function nextMonth() {
+    let newIdx = currentMonthIndex + 1;
+    if (newIdx > 5) newIdx = 5;  // 最多到5（六月）
+    setActiveMonth(newIdx);
+}
+function prevMonth() {
+    let newIdx = currentMonthIndex - 1;
+    if (newIdx < 0) newIdx = 0;  // 最小到0（一月）
+    setActiveMonth(newIdx);
+}
 
     // 导航栏
     function renderNav() {
