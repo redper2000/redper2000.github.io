@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title></title>
+    <title>普鲁士蓝 · 散落堆叠相册 | 可拖拽 + 位置保存 + 自动循环BGM</title>
     <style>
-        /* ================= 全局重置 & 艺术基调 ================= */
+        /* ================= 全局重置 & 艺术基调 (不变) ================= */
         * {
             margin: 0;
             padding: 0;
@@ -21,7 +21,6 @@
             touch-action: pan-y;
         }
 
-        /* 普鲁士蓝同心圆波浪动画 */
         .ripple-bg {
             position: fixed;
             top: 0;
@@ -134,7 +133,6 @@
         .month-btn:hover { opacity: 1; color: #ffdd99; transform: translateY(-2px); }
         .month-btn.active { opacity: 1; color: #ffc285; border-bottom: 2.5px solid #ffb347; font-weight: 900; }
 
-        /* 散落堆叠区域 */
         .scatter-area {
             position: relative;
             min-height: 65vh;
@@ -144,11 +142,21 @@
 
         .scatter-photo {
             position: absolute;
-            cursor: pointer;
-            transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1), z-index 0s, box-shadow 0.2s;
-            will-change: transform;
+            cursor: grab;
+            transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1), box-shadow 0.2s;
+            will-change: left, top;
             filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.2));
             background: transparent;
+            touch-action: none;
+        }
+        .scatter-photo:active {
+            cursor: grabbing;
+        }
+        .scatter-photo.dragging {
+            z-index: 100 !important;
+            transition: none;
+            cursor: grabbing;
+            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.4));
         }
 
         .scatter-photo:hover {
@@ -165,6 +173,7 @@
             background: rgba(20, 35, 45, 0.2);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             transition: 0.2s;
+            pointer-events: none;
         }
 
         .scatter-caption {
@@ -200,7 +209,6 @@
             margin-top: 2rem;
         }
 
-        /* 模态框 */
         .photo-zoom-overlay {
             display: none;
             position: fixed;
@@ -266,7 +274,6 @@
         }
         .close-zoom:hover { background: #b3512a; transform: scale(1.05); }
 
-        /* 音乐控制 */
         .music-toggle {
             position: fixed;
             bottom: 28px;
@@ -324,10 +331,10 @@
     <div id="scatterContainer" class="scatter-area"></div>
 </div>
 
-<div class="swipe-hint">← 左右滑动切换月份 →</div>
+<div class="swipe-hint">← 左右滑动切换月份 → | 可拖拽照片并保存位置</div>
 <button class="music-toggle" id="musicToggleBtn" aria-label="播放/暂停背景音乐">🎵</button>
 <audio id="bgmAudio" loop preload="auto">
-    <source src="audio/nop.mp3" type="audio/mpeg">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
 </audio>
 
 <div id="photoZoomOverlay" class="photo-zoom-overlay">
@@ -339,11 +346,11 @@
 </div>
 
 <script>
-    // ========= 月份数据（照片列表） =========
+    // ========= 月份数据 =========
     const monthsData = [
         { monthNum: 1, nameEn: "JANUARY", photos: [ { url: "images/2026/01/1.jpg", caption: "家属止步" }, { url: "images/2026/01/2.jpg", caption: "出生啦" }, { url: "images/2026/01/3.jpg", caption: "伟大的妈妈" }, { url: "images/2026/01/4.jpg", caption: "嘻嘻" }, { url: "images/2026/01/5.jpg", caption: "出院啦" }, { url: "images/2026/01/6.jpg", caption: "晒晒太阳" } ] },
-        { monthNum: 2, nameEn: "FEBRUARY", photos: [ { url: "images/2026/02/1.jpg", caption: "爷爷奶奶和我" }, { url: "images/2026/02/2.jpg", caption: "爸爸妈妈和我" }, { url:"images/2026/02/3.jpg", caption: "趴趴" } , { url: "images/2026/02/4.jpg", caption: "邪魅一笑" }, { url:"images/2026/02/5.jpg", caption: "嘻嘻" }, { url:"images/2026/02/6.jpg", caption: "不嘻嘻" }] },
-        { monthNum: 3, nameEn: "MARCH", photos: [ { url:  "images/2026/03/1.jpg", caption: "称体重咯" } , { url: "images/2026/03/2.jpg", caption: "look my eyes" } , { url: "images/2026/03/3.jpg", caption: "洗澡咯" } , { url: "images/2026/03/4.jpg", caption: "诶怎么这么多手" } , { url: "images/2026/03/5.jpg", caption: "安静小沈" } , { url: "images/2026/03/6.jpg", caption: "让妈妈掏鼻屎" } , { url: "images/2026/03/7.jpg", caption: "婉拒" }] },
+        { monthNum: 2, nameEn: "FEBRUARY", photos: [ { url: "https://picsum.photos/id/20/600/450", caption: "情人节絮语" }, { url: "https://picsum.photos/id/26/550/470", caption: "烟火人间" }, { url: "https://picsum.photos/id/28/620/480", caption: "围炉夜" } ] },
+        { monthNum: 3, nameEn: "MARCH", photos: [ { url: "https://picsum.photos/id/96/590/430", caption: "樱吹雪" } ] },
         { monthNum: 4, nameEn: "APRIL", photos: [ { url: "https://picsum.photos/id/29/700/500", caption: "细雨呢喃" } ] },
         { monthNum: 5, nameEn: "MAY", photos: [ { url: "https://picsum.photos/id/169/640/480", caption: "远足山海" }, { url: "https://picsum.photos/id/42/510/510", caption: "海岸晚风" } ] },
         { monthNum: 6, nameEn: "JUNE", photos: [ { url: "https://picsum.photos/id/30/580/550", caption: "童梦气球" } ] },
@@ -366,62 +373,88 @@
     const musicToggle = document.getElementById('musicToggleBtn');
 
     let currentMonthIndex = 0;
-    let touchStartX = 0;
+    let touchStartGlobal = 0;
     const minSwipeDistance = 50;
 
-    // ========= 固定布局算法：基于索引的确定性位置（螺旋分布，避免重叠，序号小的在上层） =========
-    // 参数：索引index, 总照片数total, 容器宽度cw, 容器高度ch, 照片宽度w, 照片高度h
-    // 返回 {left, top, rotate, zIndex}
-    // 算法：按索引顺序从中心向外螺旋分布，同时调整旋转角度，确保不重叠
+    // ========= 位置存储管理 =========
+    const STORAGE_KEY_PREFIX = 'photoPositions_month_';
+    
+    function savePositionsForCurrentMonth() {
+        const photos = Array.from(scatterContainer.querySelectorAll('.scatter-photo'));
+        const positions = photos.map(photo => {
+            const left = parseFloat(photo.style.left);
+            const top = parseFloat(photo.style.top);
+            return { left, top };
+        });
+        if (positions.length === 0) return;
+        localStorage.setItem(STORAGE_KEY_PREFIX + currentMonthIndex, JSON.stringify(positions));
+    }
+    
+    function loadPositionsForMonth(monthIndex) {
+        const data = localStorage.getItem(STORAGE_KEY_PREFIX + monthIndex);
+        if (data) {
+            try {
+                return JSON.parse(data);
+            } catch(e) { return null; }
+        }
+        return null;
+    }
+
+    // ========= 固定布局算法（仅用于计算初始位置，如果无存储则使用） =========
     function getFixedPosition(index, total, cw, ch, pw, ph) {
-        // 防止容器尺寸过小
         const safeCw = Math.max(cw, 500);
         const safeCh = Math.max(ch, 400);
-        // 螺旋参数：半径递增，角度递增
-        const angleStep = (Math.PI * 2) / Math.max(1, total);  // 环绕角度步长
-        const radiusStep = Math.min(safeCw, safeCh) * 0.28;    // 每圈半径增量
-        
-        // 索引0在中心偏上，之后螺旋向外
+        const angleStep = (Math.PI * 2) / Math.max(1, total);
+        const radiusStep = Math.min(safeCw, safeCh) * 0.28;
         let radius = radiusStep * Math.sqrt(index + 0.5);
         let angle = index * angleStep * 1.5 + (index % 3) * 0.8;
-        
         let centerX = safeCw / 2;
-        let centerY = safeCh / 2.2;  // 整体偏上，让底部留空间给caption
-        
+        let centerY = safeCh / 2.2;
         let left = centerX + radius * Math.cos(angle) - pw/2;
-        let top = centerY + radius * Math.sin(angle) * 0.7 - ph/2;  // 垂直压缩，避免超出
-        
-        // 边界修正（确保不超出容器边缘太多，保留30px边距）
+        let top = centerY + radius * Math.sin(angle) * 0.7 - ph/2;
         left = Math.min(Math.max(left, 20), safeCw - pw - 20);
         top = Math.min(Math.max(top, 20), safeCh - ph - 30);
-        
-        // 旋转角度：与半径和索引相关，保持稳定
         let rotate = (Math.sin(index * 2.3) * 6 + Math.cos(index * 1.7) * 3).toFixed(1);
-        // zIndex：序号小的在上层（索引0最高）
         let zIndex = total - index + 5;
-        
         return { left, top, rotate, zIndex };
     }
 
-    // 重新计算并设置所有照片的位置（不依赖随机数，每次结果相同）
-    function repositionPhotos(photoElements, containerRect) {
+    function repositionPhotos(photoElements, containerRect, useSavedPositions = true) {
         if (!containerRect || containerRect.width === 0) return;
         const cw = containerRect.width;
         const ch = containerRect.height;
         const total = photoElements.length;
-        // 先确保所有照片已经添加到DOM且有固定宽度（在创建时已设置）
+        // 尝试加载存储的位置
+        let savedPositions = null;
+        if (useSavedPositions) {
+            savedPositions = loadPositionsForMonth(currentMonthIndex);
+        }
         photoElements.forEach((item, idx) => {
             const div = item.div;
             const pw = div.offsetWidth;
             const ph = div.offsetHeight;
             if (pw === 0 || ph === 0) return;
-            const pos = getFixedPosition(idx, total, cw, ch, pw, ph);
+            let pos;
+            if (savedPositions && savedPositions[idx]) {
+                // 使用保存的 left/top，但确保不超出容器边界
+                let left = savedPositions[idx].left;
+                let top = savedPositions[idx].top;
+                // 边界修正
+                left = Math.min(Math.max(left, -50), cw - pw + 50);
+                top = Math.min(Math.max(top, -50), ch - ph + 50);
+                pos = { left, top };
+            } else {
+                pos = getFixedPosition(idx, total, cw, ch, pw, ph);
+            }
+            // 旋转角度仍用算法（拖拽不改变旋转）
+            const rotate = (Math.sin(idx * 2.3) * 6 + Math.cos(idx * 1.7) * 3).toFixed(1);
+            const zIndex = total - idx + 5;
             div.style.left = `${pos.left}px`;
             div.style.top = `${pos.top}px`;
-            div.style.transform = `rotate(${pos.rotate}deg)`;
-            div.style.zIndex = pos.zIndex;
+            div.style.transform = `rotate(${rotate}deg)`;
+            div.style.zIndex = zIndex;
         });
-        // 计算容器高度自适应
+        // 调整容器高度
         let maxBottom = 0;
         photoElements.forEach(item => {
             const div = item.div;
@@ -433,7 +466,84 @@
         scatterContainer.style.minHeight = `${Math.max(maxBottom + 80, 480)}px`;
     }
 
-    // 渲染当前月份的照片（创建固定宽度、统一样式，然后计算位置）
+    // ========= 拖拽功能（带保存） =========
+    function makeDraggable(element) {
+        let startX = 0, startY = 0;
+        let initialLeft = 0, initialTop = 0;
+        let isDragging = false;
+        let dragStarted = false;
+        let moveDistance = 0;
+
+        function onPointerDown(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            startX = e.clientX ?? e.touches[0].clientX;
+            startY = e.clientY ?? e.touches[0].clientY;
+            initialLeft = parseFloat(element.style.left);
+            initialTop = parseFloat(element.style.top);
+            isDragging = true;
+            dragStarted = false;
+            moveDistance = 0;
+            element.classList.add('dragging');
+            window.addEventListener('mousemove', onPointerMove);
+            window.addEventListener('mouseup', onPointerUp);
+            element.addEventListener('touchmove', onPointerMove, { passive: false });
+            element.addEventListener('touchend', onPointerUp);
+            element.addEventListener('touchcancel', onPointerUp);
+        }
+
+        function onPointerMove(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            e.stopPropagation();
+            let currentX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
+            let currentY = e.clientY ?? (e.touches ? e.touches[0].clientY : 0);
+            let deltaX = currentX - startX;
+            let deltaY = currentY - startY;
+            moveDistance = Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+            if (!dragStarted && moveDistance > 5) {
+                dragStarted = true;
+            }
+            if (dragStarted) {
+                let newLeft = initialLeft + deltaX;
+                let newTop = initialTop + deltaY;
+                const containerRect = scatterContainer.getBoundingClientRect();
+                const maxLeft = containerRect.width - element.offsetWidth;
+                const maxTop = containerRect.height - element.offsetHeight;
+                newLeft = Math.min(Math.max(newLeft, -50), maxLeft + 50);
+                newTop = Math.min(Math.max(newTop, -50), maxTop + 50);
+                element.style.left = newLeft + 'px';
+                element.style.top = newTop + 'px';
+            }
+        }
+
+        function onPointerUp(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            element.classList.remove('dragging');
+            // 如果没有拖动，视为点击放大
+            if (!dragStarted && moveDistance < 5) {
+                const photoUrl = element.querySelector('img')?.src;
+                const caption = element.querySelector('.scatter-caption')?.textContent;
+                if (photoUrl) openZoom(photoUrl, caption);
+            } else if (dragStarted) {
+                // 拖动结束后保存所有照片位置
+                savePositionsForCurrentMonth();
+            }
+            window.removeEventListener('mousemove', onPointerMove);
+            window.removeEventListener('mouseup', onPointerUp);
+            element.removeEventListener('touchmove', onPointerMove);
+            element.removeEventListener('touchend', onPointerUp);
+            element.removeEventListener('touchcancel', onPointerUp);
+            dragStarted = false;
+            moveDistance = 0;
+        }
+
+        element.addEventListener('mousedown', onPointerDown);
+        element.addEventListener('touchstart', onPointerDown, { passive: false });
+    }
+
+    // 渲染当前月份的照片
     function renderScatterPhotos() {
         const currentMonth = monthsData[currentMonthIndex];
         const photos = currentMonth.photos;
@@ -447,7 +557,6 @@
             return;
         }
 
-        // 根据屏幕宽度确定照片基础宽度（手机端稍小）
         const isMobile = window.innerWidth <= 760;
         const baseWidth = isMobile ? 170 : 230;
         const photoElements = [];
@@ -456,77 +565,69 @@
         photos.forEach((photo, idx) => {
             const photoDiv = document.createElement('div');
             photoDiv.className = 'scatter-photo';
-            // 固定宽度，高度由图片比例决定
             photoDiv.style.width = `${baseWidth}px`;
-            // 初始临时位置（避免闪动），稍后重算
             photoDiv.style.left = '0px';
             photoDiv.style.top = '0px';
-            
             const img = document.createElement('img');
             img.src = photo.url;
             img.alt = photo.caption;
             img.className = 'scatter-img';
             img.loading = 'lazy';
-            
             const captionSpan = document.createElement('div');
             captionSpan.className = 'scatter-caption';
             captionSpan.textContent = photo.caption;
-            
             photoDiv.appendChild(img);
             photoDiv.appendChild(captionSpan);
-            photoDiv.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openZoom(photo.url, photo.caption);
-            });
-            
             fragment.appendChild(photoDiv);
             photoElements.push({ div: photoDiv, idx });
         });
-        
         scatterContainer.appendChild(fragment);
         
-        // 等待所有图片加载完成或超时后执行布局
+        // 等待图片加载完成再布局
         const pendingImgs = photoElements.map(p => p.div.querySelector('img'));
         let loadedCount = 0;
         const tryLayout = () => {
             const rect = scatterContainer.getBoundingClientRect();
-            repositionPhotos(photoElements, rect);
+            repositionPhotos(photoElements, rect, true);
+            // 绑定拖拽
+            photoElements.forEach(item => {
+                makeDraggable(item.div);
+            });
         };
         const checkComplete = () => {
             loadedCount++;
-            if (loadedCount === pendingImgs.length) {
-                tryLayout();
-            }
+            if (loadedCount === pendingImgs.length) tryLayout();
         };
         if (pendingImgs.length === 0) {
             tryLayout();
         } else {
             pendingImgs.forEach(img => {
-                if (img.complete) {
-                    loadedCount++;
-                } else {
+                if (img.complete) loadedCount++;
+                else {
                     img.addEventListener('load', checkComplete);
                     img.addEventListener('error', checkComplete);
                 }
             });
             if (loadedCount === pendingImgs.length) tryLayout();
-            else setTimeout(tryLayout, 400); // 降级：即使未加载完也尝试布局
+            else setTimeout(tryLayout, 400);
         }
         
-        // 窗口尺寸变化时重新计算位置（保持固定布局）
+        // resize 时重新调整位置（保持保存的位置，仅做边界修正）
         const resizeHandler = () => {
             if (!scatterContainer || scatterContainer.children.length === 0) return;
             const currentPhotos = Array.from(scatterContainer.querySelectorAll('.scatter-photo')).map(div => ({ div }));
             if (currentPhotos.length) {
                 const rect = scatterContainer.getBoundingClientRect();
-                repositionPhotos(currentPhotos, rect);
+                repositionPhotos(currentPhotos, rect, true);
+                // 重新保存一次（确保边界调整后的位置存下来，可选）
+                savePositionsForCurrentMonth();
             }
         };
         window.removeEventListener('resize', resizeHandler);
         window.addEventListener('resize', resizeHandler);
     }
 
-    // ========= 放大功能 =========
+    // 放大预览
     function openZoom(url, caption) {
         zoomImg.src = url;
         zoomCaption.textContent = caption;
@@ -551,71 +652,44 @@
         document.body.style.overflow = '';
     }
 
-    // ========= 月份切换 =========
+    // 月份切换
     function setActiveMonth(index) {
-    if (index === currentMonthIndex) return;
-    // 限制只允许0~5
-    if (index < 0) index = 0;
-    if (index >= 6) index = 5;
-    if (index === currentMonthIndex) return;
-    currentMonthIndex = index;
-    const btns = document.querySelectorAll('.month-btn');
-    btns.forEach((btn, i) => {
-        if (i === currentMonthIndex) btn.classList.add('active');
-        else btn.classList.remove('active');
-    });
-    renderScatterPhotos();
-}
-    //function setActiveMonth(index) {
-    //    if (index === currentMonthIndex) return;
-    //    currentMonthIndex = index;
-    //    const btns = document.querySelectorAll('.month-btn');
-    //    btns.forEach((btn, i) => {
-    //        if (i === currentMonthIndex) btn.classList.add('active');
-    //        else btn.classList.remove('active');
-    //    });
-    //    renderScatterPhotos();
-    //}
-    //function nextMonth() { setActiveMonth((currentMonthIndex + 1) % monthsData.length); }
-    //function prevMonth() { setActiveMonth((currentMonthIndex - 1 + monthsData.length) % monthsData.length); }
+        if (index === currentMonthIndex) return;
+        if (index < 0) index = 0;
+        if (index >= monthsData.length) index = monthsData.length - 1;
+        if (index === currentMonthIndex) return;
+        currentMonthIndex = index;
+        const btns = document.querySelectorAll('.month-btn');
+        btns.forEach((btn, i) => {
+            if (i === currentMonthIndex) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        renderScatterPhotos();
+    }
     function nextMonth() {
-    let newIdx = currentMonthIndex + 1;
-    if (newIdx > 5) newIdx = 5;  // 最多到5（六月）
-    setActiveMonth(newIdx);
-}
-function prevMonth() {
-    let newIdx = currentMonthIndex - 1;
-    if (newIdx < 0) newIdx = 0;  // 最小到0（一月）
-    setActiveMonth(newIdx);
-}
+        let newIdx = currentMonthIndex + 1;
+        if (newIdx >= monthsData.length) newIdx = monthsData.length - 1;
+        setActiveMonth(newIdx);
+    }
+    function prevMonth() {
+        let newIdx = currentMonthIndex - 1;
+        if (newIdx < 0) newIdx = 0;
+        setActiveMonth(newIdx);
+    }
 
-    // 导航栏
     function renderNav() {
-    monthsNav.innerHTML = '';
-    // 只显示前6个月（索引0~5）
-    const visibleMonths = monthsData.slice(0, 6);
-    visibleMonths.forEach((month, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'month-btn';
-        btn.textContent = month.nameEn;
-        if (idx === currentMonthIndex) btn.classList.add('active');
-        btn.addEventListener('click', () => setActiveMonth(idx));
-        monthsNav.appendChild(btn);
-    });
-}
-//    function renderNav() {
- //       monthsNav.innerHTML = '';
- //       monthsData.forEach((month, idx) => {
-   //         const btn = document.createElement('button');
-  //          btn.className = 'month-btn';
-   //         btn.textContent = month.nameEn;
-   //         if (idx === currentMonthIndex) btn.classList.add('active');
-    //        btn.addEventListener('click', () => setActiveMonth(idx));
-    //        monthsNav.appendChild(btn);
-  //      });
- //   }
+        monthsNav.innerHTML = '';
+        monthsData.forEach((month, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'month-btn';
+            btn.textContent = month.nameEn;
+            if (idx === currentMonthIndex) btn.classList.add('active');
+            btn.addEventListener('click', () => setActiveMonth(idx));
+            monthsNav.appendChild(btn);
+        });
+    }
 
-    // ========= 音乐控制（自动循环播放 + 用户提供的 toggle 逻辑） =========
+    // ========= 音乐控制 =========
     let isMusicPlaying = false;
     function toggleMusic() {
         if (isMusicPlaying) {
@@ -640,8 +714,6 @@ function prevMonth() {
     }
     bgmAudio.volume = 0.5;
     musicToggle.addEventListener('click', toggleMusic);
-
-    // 自动播放并循环（静默处理浏览器限制）
     bgmAudio.play().then(() => {
         isMusicPlaying = true;
         musicToggle.textContent = '🎵';
@@ -650,7 +722,31 @@ function prevMonth() {
         musicToggle.textContent = '🔇';
     });
 
-    // ========= 交互事件 =========
+    // ========= 全局触摸滑动切换月份（不与拖拽冲突） =========
+    let isDraggingPhotoGlobal = false;
+    function onGlobalTouchStart(e) {
+        if (zoomOverlay.style.display === 'flex') return;
+        if (e.target.closest('.scatter-photo')) {
+            isDraggingPhotoGlobal = true;
+            return;
+        }
+        touchStartGlobal = e.changedTouches[0].screenX;
+    }
+    function onGlobalTouchEnd(e) {
+        if (zoomOverlay.style.display === 'flex') return;
+        if (isDraggingPhotoGlobal) {
+            isDraggingPhotoGlobal = false;
+            return;
+        }
+        const delta = e.changedTouches[0].screenX - touchStartGlobal;
+        if (Math.abs(delta) > minSwipeDistance) {
+            if (delta > 0) prevMonth();
+            else nextMonth();
+        }
+        touchStartGlobal = 0;
+    }
+    document.body.addEventListener('touchstart', onGlobalTouchStart, { passive: false });
+    document.body.addEventListener('touchend', onGlobalTouchEnd);
     document.addEventListener('keydown', (e) => {
         if (zoomOverlay.style.display === 'flex') {
             if (e.key === 'Escape') closeZoom();
@@ -659,21 +755,6 @@ function prevMonth() {
         if (e.key === 'ArrowLeft') { e.preventDefault(); prevMonth(); }
         if (e.key === 'ArrowRight') { e.preventDefault(); nextMonth(); }
     });
-    function handleTouchStart(e) {
-        if (zoomOverlay.style.display === 'flex') return;
-        touchStartX = e.changedTouches[0].screenX;
-    }
-    function handleTouchEnd(e) {
-        if (zoomOverlay.style.display === 'flex') return;
-        const delta = e.changedTouches[0].screenX - touchStartX;
-        if (Math.abs(delta) > minSwipeDistance) {
-            if (delta > 0) prevMonth();
-            else nextMonth();
-        }
-        touchStartX = 0;
-    }
-    document.body.addEventListener('touchstart', handleTouchStart, { passive: false });
-    document.body.addEventListener('touchend', handleTouchEnd);
     closeZoomBtn.addEventListener('click', closeZoom);
     zoomOverlay.addEventListener('click', (e) => { if (e.target === zoomOverlay) closeZoom(); });
 
