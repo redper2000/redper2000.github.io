@@ -615,7 +615,7 @@ function prevMonth() {
   //      });
  //   }
 
-    // ========= BGM控制 =========
+    // ========= 音乐控制（自动循环播放 + 用户提供的 toggle 逻辑） =========
     let isMusicPlaying = false;
     function toggleMusic() {
         if (isMusicPlaying) {
@@ -640,6 +640,15 @@ function prevMonth() {
     }
     bgmAudio.volume = 0.5;
     musicToggle.addEventListener('click', toggleMusic);
+
+    // 自动播放并循环（静默处理浏览器限制）
+    bgmAudio.play().then(() => {
+        isMusicPlaying = true;
+        musicToggle.textContent = '🎵';
+    }).catch(() => {
+        isMusicPlaying = false;
+        musicToggle.textContent = '🔇';
+    });
 
     // ========= 交互事件 =========
     document.addEventListener('keydown', (e) => {
