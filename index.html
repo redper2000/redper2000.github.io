@@ -334,7 +334,7 @@
 <div class="swipe-hint">← 左右滑动切换月份 → | 可拖拽照片并保存位置</div>
 <button class="music-toggle" id="musicToggleBtn" aria-label="播放/暂停背景音乐">🎵</button>
 <audio id="bgmAudio" loop preload="auto">
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    <source src="audio/nop.mp3" type="audio/mpeg">
 </audio>
 
 <div id="photoZoomOverlay" class="photo-zoom-overlay">
@@ -349,17 +349,17 @@
     // ========= 月份数据 =========
     const monthsData = [
         { monthNum: 1, nameEn: "JANUARY", photos: [ { url: "images/2026/01/1.jpg", caption: "家属止步" }, { url: "images/2026/01/2.jpg", caption: "出生啦" }, { url: "images/2026/01/3.jpg", caption: "伟大的妈妈" }, { url: "images/2026/01/4.jpg", caption: "嘻嘻" }, { url: "images/2026/01/5.jpg", caption: "出院啦" }, { url: "images/2026/01/6.jpg", caption: "晒晒太阳" } ] },
-        { monthNum: 2, nameEn: "FEBRUARY", photos: [ { url: "https://picsum.photos/id/20/600/450", caption: "情人节絮语" }, { url: "https://picsum.photos/id/26/550/470", caption: "烟火人间" }, { url: "https://picsum.photos/id/28/620/480", caption: "围炉夜" } ] },
-        { monthNum: 3, nameEn: "MARCH", photos: [ { url: "https://picsum.photos/id/96/590/430", caption: "樱吹雪" } ] },
-        { monthNum: 4, nameEn: "APRIL", photos: [ { url: "https://picsum.photos/id/29/700/500", caption: "细雨呢喃" } ] },
-        { monthNum: 5, nameEn: "MAY", photos: [ { url: "https://picsum.photos/id/169/640/480", caption: "远足山海" }, { url: "https://picsum.photos/id/42/510/510", caption: "海岸晚风" } ] },
-        { monthNum: 6, nameEn: "JUNE", photos: [ { url: "https://picsum.photos/id/30/580/550", caption: "童梦气球" } ] },
-        { monthNum: 7, nameEn: "JULY", photos: [ { url: "https://picsum.photos/id/59/620/460", caption: "盛夏冰语" } ] },
-        { monthNum: 8, nameEn: "AUGUST", photos: [ { url: "https://picsum.photos/id/47/590/530", caption: "山野星辰" } ] },
-        { monthNum: 9, nameEn: "SEPTEMBER", photos: [ { url: "https://picsum.photos/id/34/680/490", caption: "桂香满径" } ] },
-        { monthNum: 10, nameEn: "OCTOBER", photos: [ { url: "https://picsum.photos/id/29/610/500", caption: "银杏金箔" } ] },
-        { monthNum: 11, nameEn: "NOVEMBER", photos: [ { url: "https://picsum.photos/id/64/570/540", caption: "深秋炉火" } ] },
-        { monthNum: 12, nameEn: "DECEMBER", photos: [ { url: "https://picsum.photos/id/91/630/470", caption: "圣诞颂歌" }, { url: "https://picsum.photos/id/100/600/600", caption: "跨年星火" } ] }
+        { monthNum: 2, nameEn: "FEBRUARY", photos: [ { url: "images/2026/02/1.jpg", caption: "爷爷奶奶和我" }, { url: "images/2026/02/2.jpg", caption: "爸爸妈妈和我" }, { url: "images/2026/02/3.jpg", caption: "趴趴" }, { url: "images/2026/02/4.jpg", caption: "邪魅一笑" }, { url: "images/2026/02/5.jpg", caption: "嘻嘻" }, { url: "images/2026/02/3.jpg", caption: "不嘻嘻" }  ] },
+        { monthNum: 3, nameEn: "MARCH", photos: [ { url: "images/2026/03/1.jpg", caption: "称体重嗷" }, { url: "images/2026/03/2.jpg", caption: "look my eyes" }, { url: "images/2026/03/3.jpg", caption: "洗澡澡" }, { url: "images/2026/03/4.jpg", caption: "诶怎么这么多手" }, { url: "images/2026/03/5.jpg", caption: "安静小沈" }, { url: "images/2026/03/6.jpg", caption: "掏鼻屎哦" }, { url: "images/2026/03/7.jpg", caption: "婉拒" } ] },
+        { monthNum: 4, nameEn: "APRIL", photos: [ { url: "images/2026/04/1.jpg", caption: "收手吧!阿熊" }, { url: "images/2026/04/2.jpg", caption: "啊?" }, { url: "images/2026/04/3.jpg", caption: "稳如齐眉山" }, { url: "images/2026/04/4.jpg", caption: "让哥瞅瞅" }, { url: "images/2026/04/5.jpg", caption: "开心呀" } , { url: "images/2026/04/6.jpg", caption: "围观" }, { url: "images/2026/04/7.jpg", caption: "是爷俩" }] },
+        { monthNum: 5, nameEn: "MAY", photos: [ { url: "images/2026/05/1.jpg", caption: "出门睡觉" }, { url: "images/2026/05/2.jpg", caption: "小小歌唱家" } , { url: "images/2026/05/3.jpg", caption: "一家三口" }, { url: "images/2026/05/4.jpg", caption: "伸个懒腰诶" }, { url: "images/2026/05/5.jpg", caption: "武将!" }, { url: "images/2026/05/6.jpg", caption: "太奶奶和我" }, { url: "images/2026/05/7.jpg", caption: "坚毅的眼神" }, { url: "images/2026/05/8.jpg", caption: "洗澡?OK的" }] },
+        { monthNum: 6, nameEn: "JUNE", photos: [ { url: "images/2026/06/1.jpg", caption: "有点镜头包袱在的" } ] },
+        //{ monthNum: 7, nameEn: "JULY", photos: [ { url: "https://picsum.photos/id/59/620/460", caption: "盛夏冰语" } ] },
+        //{ monthNum: 8, nameEn: "AUGUST", photos: [ { url: "https://picsum.photos/id/47/590/530", caption: "山野星辰" } ] },
+        //{ monthNum: 9, nameEn: "SEPTEMBER", photos: [ { url: "https://picsum.photos/id/34/680/490", caption: "桂香满径" } ] },
+        //{ monthNum: 10, nameEn: "OCTOBER", photos: [ { url: "https://picsum.photos/id/29/610/500", caption: "银杏金箔" } ] },
+        //{ monthNum: 11, nameEn: "NOVEMBER", photos: [ { url: "https://picsum.photos/id/64/570/540", caption: "深秋炉火" } ] },
+        //{ monthNum: 12, nameEn: "DECEMBER", photos: [ { url: "https://picsum.photos/id/91/630/470", caption: "圣诞颂歌" }, { url: "https://picsum.photos/id/100/600/600", caption: "跨年星火" } ] }
     ];
 
     // DOM 元素
