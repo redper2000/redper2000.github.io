@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>小头哥成长日记</title>
     <style>
-        /* ================= 全局重置 & 艺术基调 (不变) ================= */
+        /* ================= 全局重置 & 艺术基调 ================= */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none; /* 避免拖拽时选中文字/图片，提升手感 */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -18,7 +20,7 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
-            touch-action: pan-y;
+            touch-action: pan-y; /* 保留垂直滚动，水平滚动交给照片拖拽和月份滑动 */
         }
 
         .ripple-bg {
@@ -147,7 +149,7 @@
             will-change: left, top;
             filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.2));
             background: transparent;
-            touch-action: none;
+            touch-action: none;       /* 完全禁止浏览器默认滚动/缩放，拖拽更跟手 */
         }
         .scatter-photo:active {
             cursor: grabbing;
@@ -173,7 +175,7 @@
             background: rgba(20, 35, 45, 0.2);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             transition: 0.2s;
-            pointer-events: none;
+            pointer-events: none;     /* 让拖拽事件直接由父级处理，避免图片干扰 */
         }
 
         .scatter-caption {
@@ -331,7 +333,7 @@
     <div id="scatterContainer" class="scatter-area"></div>
 </div>
 
-<div class="swipe-hint"></div>
+<div class="swipe-hint">← 左右滑动切换月份 | 拖拽照片自由排列 →</div>
 <button class="music-toggle" id="musicToggleBtn" aria-label="播放/暂停背景音乐">🎵</button>
 <audio id="bgmAudio" loop preload="auto">
     <source src="audio/nop.mp3" type="audio/mpeg">
@@ -346,20 +348,15 @@
 </div>
 
 <script>
-    // ========= 月份数据 =========
+    // ========= 月份数据（保留所有图片路径） =========
     const monthsData = [
         { monthNum: 1, nameEn: "JANUARY", photos: [ { url: "images/2026/01/1.jpg", caption: "家属止步" }, { url: "images/2026/01/2.jpg", caption: "出生啦" }, { url: "images/2026/01/3.jpg", caption: "伟大的妈妈" }, { url: "images/2026/01/4.jpg", caption: "嘻嘻" }, { url: "images/2026/01/5.jpg", caption: "出院啦" }, { url: "images/2026/01/6.jpg", caption: "晒晒太阳" } ] },
         { monthNum: 2, nameEn: "FEBRUARY", photos: [ { url: "images/2026/02/1.jpg", caption: "爷爷奶奶和我" }, { url: "images/2026/02/2.jpg", caption: "爸爸妈妈和我" }, { url: "images/2026/02/3.jpg", caption: "趴趴" }, { url: "images/2026/02/4.jpg", caption: "邪魅一笑" }, { url: "images/2026/02/5.jpg", caption: "嘻嘻" }, { url: "images/2026/02/6.jpg", caption: "不嘻嘻" }  ] },
         { monthNum: 3, nameEn: "MARCH", photos: [ { url: "images/2026/03/1.jpg", caption: "称体重嗷" }, { url: "images/2026/03/2.jpg", caption: "look my eyes" }, { url: "images/2026/03/3.jpg", caption: "洗澡澡" }, { url: "images/2026/03/4.jpg", caption: "诶怎么这么多手" }, { url: "images/2026/03/5.jpg", caption: "安静小沈" }, { url: "images/2026/03/6.jpg", caption: "掏鼻屎哦" }, { url: "images/2026/03/7.jpg", caption: "婉拒" } ] },
         { monthNum: 4, nameEn: "APRIL", photos: [ { url: "images/2026/04/1.jpg", caption: "收手吧!阿熊" }, { url: "images/2026/04/2.jpg", caption: "啊?" }, { url: "images/2026/04/3.jpg", caption: "稳如齐眉山" }, { url: "images/2026/04/4.jpg", caption: "让哥瞅瞅" }, { url: "images/2026/04/5.jpg", caption: "开心呀" } , { url: "images/2026/04/6.jpg", caption: "围观" }, { url: "images/2026/04/7.jpg", caption: "是爷俩" }] },
         { monthNum: 5, nameEn: "MAY", photos: [ { url: "images/2026/05/1.jpg", caption: "出门睡觉" }, { url: "images/2026/05/2.jpg", caption: "小小歌唱家" } , { url: "images/2026/05/3.jpg", caption: "一家三口" }, { url: "images/2026/05/4.jpg", caption: "伸个懒腰诶" }, { url: "images/2026/05/5.jpg", caption: "武将!" }, { url: "images/2026/05/6.jpg", caption: "太奶奶和我" }, { url: "images/2026/05/7.jpg", caption: "坚毅的眼神" }, { url: "images/2026/05/8.jpg", caption: "洗澡?OK的" }] },
-        { monthNum: 6, nameEn: "JUNE", photos: [ { url: "images/2026/06/1.jpg", caption: "有点镜头包袱在的" } ] },
-        //{ monthNum: 7, nameEn: "JULY", photos: [ { url: "https://picsum.photos/id/59/620/460", caption: "盛夏冰语" } ] },
-        //{ monthNum: 8, nameEn: "AUGUST", photos: [ { url: "https://picsum.photos/id/47/590/530", caption: "山野星辰" } ] },
-        //{ monthNum: 9, nameEn: "SEPTEMBER", photos: [ { url: "https://picsum.photos/id/34/680/490", caption: "桂香满径" } ] },
-        //{ monthNum: 10, nameEn: "OCTOBER", photos: [ { url: "https://picsum.photos/id/29/610/500", caption: "银杏金箔" } ] },
-        //{ monthNum: 11, nameEn: "NOVEMBER", photos: [ { url: "https://picsum.photos/id/64/570/540", caption: "深秋炉火" } ] },
-        //{ monthNum: 12, nameEn: "DECEMBER", photos: [ { url: "https://picsum.photos/id/91/630/470", caption: "圣诞颂歌" }, { url: "https://picsum.photos/id/100/600/600", caption: "跨年星火" } ] }
+        { monthNum: 6, nameEn: "JUNE", photos: [ { url: "images/2026/06/1.jpg", caption: "有点镜头包袱在的" } ] }
+        // 后续月份可自由扩展
     ];
 
     // DOM 元素
@@ -373,8 +370,11 @@
     const musicToggle = document.getElementById('musicToggleBtn');
 
     let currentMonthIndex = 0;
-    let touchStartGlobal = 0;
+    let touchStartGlobalX = 0;
     const minSwipeDistance = 50;
+
+    // ========= 关键优化：全局拖拽标志，彻底分离照片拖拽与月份滑动 =========
+    let draggingPhotoActive = false;   // 正在拖拽照片（包括轻点未移动时也视为“照片交互”）
 
     // ========= 位置存储管理 =========
     const STORAGE_KEY_PREFIX = 'photoPositions_month_';
@@ -400,7 +400,7 @@
         return null;
     }
 
-    // ========= 固定布局算法（仅用于计算初始位置，如果无存储则使用） =========
+    // ========= 固定布局算法（默认散射布局，无存储时用） =========
     function getFixedPosition(index, total, cw, ch, pw, ph) {
         const safeCw = Math.max(cw, 500);
         const safeCh = Math.max(ch, 400);
@@ -424,7 +424,6 @@
         const cw = containerRect.width;
         const ch = containerRect.height;
         const total = photoElements.length;
-        // 尝试加载存储的位置
         let savedPositions = null;
         if (useSavedPositions) {
             savedPositions = loadPositionsForMonth(currentMonthIndex);
@@ -436,17 +435,14 @@
             if (pw === 0 || ph === 0) return;
             let pos;
             if (savedPositions && savedPositions[idx]) {
-                // 使用保存的 left/top，但确保不超出容器边界
                 let left = savedPositions[idx].left;
                 let top = savedPositions[idx].top;
-                // 边界修正
                 left = Math.min(Math.max(left, -50), cw - pw + 50);
                 top = Math.min(Math.max(top, -50), ch - ph + 50);
                 pos = { left, top };
             } else {
                 pos = getFixedPosition(idx, total, cw, ch, pw, ph);
             }
-            // 旋转角度仍用算法（拖拽不改变旋转）
             const rotate = (Math.sin(idx * 2.3) * 6 + Math.cos(idx * 1.7) * 3).toFixed(1);
             const zIndex = total - idx + 5;
             div.style.left = `${pos.left}px`;
@@ -454,7 +450,7 @@
             div.style.transform = `rotate(${rotate}deg)`;
             div.style.zIndex = zIndex;
         });
-        // 调整容器高度
+        // 动态撑高容器，避免溢出
         let maxBottom = 0;
         photoElements.forEach(item => {
             const div = item.div;
@@ -466,7 +462,7 @@
         scatterContainer.style.minHeight = `${Math.max(maxBottom + 80, 480)}px`;
     }
 
-    // ========= 拖拽功能（带保存） =========
+    // ========= 拖拽功能（优化触摸冲突 + 自动保存） =========
     function makeDraggable(element) {
         let startX = 0, startY = 0;
         let initialLeft = 0, initialTop = 0;
@@ -475,16 +471,20 @@
         let moveDistance = 0;
 
         function onPointerDown(e) {
-            e.preventDefault();
+            e.preventDefault();      // 彻底阻止任何浏览器默认行为（滚动/长按菜单）
             e.stopPropagation();
-            startX = e.clientX ?? e.touches[0].clientX;
-            startY = e.clientY ?? e.touches[0].clientY;
+            // 关键: 任何触摸在照片上开始，立刻激活全局拖拽标志，禁止月份滑动
+            draggingPhotoActive = true;
+            
+            startX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
+            startY = e.clientY ?? (e.touches ? e.touches[0].clientY : 0);
             initialLeft = parseFloat(element.style.left);
             initialTop = parseFloat(element.style.top);
             isDragging = true;
             dragStarted = false;
             moveDistance = 0;
             element.classList.add('dragging');
+            
             window.addEventListener('mousemove', onPointerMove);
             window.addEventListener('mouseup', onPointerUp);
             element.addEventListener('touchmove', onPointerMove, { passive: false });
@@ -521,15 +521,27 @@
             if (!isDragging) return;
             isDragging = false;
             element.classList.remove('dragging');
-            // 如果没有拖动，视为点击放大
+            
+            // 如果没有实质拖动（moveDistance<5），视为点击放大照片
             if (!dragStarted && moveDistance < 5) {
                 const photoUrl = element.querySelector('img')?.src;
                 const caption = element.querySelector('.scatter-caption')?.textContent;
                 if (photoUrl) openZoom(photoUrl, caption);
             } else if (dragStarted) {
-                // 拖动结束后保存所有照片位置
+                // 拖动结束，保存所有照片的新位置
                 savePositionsForCurrentMonth();
             }
+            
+            // 重要: 清除拖拽标志（延迟一小段时间，确保全局touchend能够读取到拖拽状态，避免月份滑动误触发）
+            // 因为全局touchend可能在onPointerUp之后同步触发，我们使用setTimeout稍微延后重置标志
+            // 但为了不影响下一次触摸，同时又要让本次全局touchend能看到draggingPhotoActive = true,
+            // 这里先保留标志，等待一个微任务或短暂延迟再重置，保证全局事件循环中已经消费完。
+            // 最稳妥：在setTimeout中重置，让任何同步的全局touchend先判断到true并阻止月份切换。
+            setTimeout(() => {
+                draggingPhotoActive = false;
+            }, 50);
+            
+            // 清理事件监听
             window.removeEventListener('mousemove', onPointerMove);
             window.removeEventListener('mouseup', onPointerUp);
             element.removeEventListener('touchmove', onPointerMove);
@@ -543,7 +555,7 @@
         element.addEventListener('touchstart', onPointerDown, { passive: false });
     }
 
-    // 渲染当前月份的照片
+    // 渲染当前月份照片（散射 + 拖拽初始化）
     function renderScatterPhotos() {
         const currentMonth = monthsData[currentMonthIndex];
         const photos = currentMonth.photos;
@@ -583,13 +595,13 @@
         });
         scatterContainer.appendChild(fragment);
         
-        // 等待图片加载完成再布局
+        // 等待图片加载完成再布局（避免尺寸不准）
         const pendingImgs = photoElements.map(p => p.div.querySelector('img'));
         let loadedCount = 0;
         const tryLayout = () => {
             const rect = scatterContainer.getBoundingClientRect();
             repositionPhotos(photoElements, rect, true);
-            // 绑定拖拽
+            // 绑定拖拽（每个照片独立）
             photoElements.forEach(item => {
                 makeDraggable(item.div);
             });
@@ -612,22 +624,21 @@
             else setTimeout(tryLayout, 400);
         }
         
-        // resize 时重新调整位置（保持保存的位置，仅做边界修正）
+        // 窗口缩放时重新调整位置（保留用户已存储位置）
         const resizeHandler = () => {
             if (!scatterContainer || scatterContainer.children.length === 0) return;
             const currentPhotos = Array.from(scatterContainer.querySelectorAll('.scatter-photo')).map(div => ({ div }));
             if (currentPhotos.length) {
                 const rect = scatterContainer.getBoundingClientRect();
                 repositionPhotos(currentPhotos, rect, true);
-                // 重新保存一次（确保边界调整后的位置存下来，可选）
-                savePositionsForCurrentMonth();
+                savePositionsForCurrentMonth();  // 边界修正后保存
             }
         };
         window.removeEventListener('resize', resizeHandler);
         window.addEventListener('resize', resizeHandler);
     }
 
-    // 放大预览
+    // 放大预览（无冲突）
     function openZoom(url, caption) {
         zoomImg.src = url;
         zoomCaption.textContent = caption;
@@ -652,7 +663,7 @@
         document.body.style.overflow = '';
     }
 
-    // 月份切换
+    // 月份切换逻辑
     function setActiveMonth(index) {
         if (index === currentMonthIndex) return;
         if (index < 0) index = 0;
@@ -689,7 +700,7 @@
         });
     }
 
-    // ========= 音乐控制 =========
+    // ========= 音乐控制（保持不变） =========
     let isMusicPlaying = false;
     function toggleMusic() {
         if (isMusicPlaying) {
@@ -722,31 +733,34 @@
         musicToggle.textContent = '🔇';
     });
 
-    // ========= 全局触摸滑动切换月份（不与拖拽冲突） =========
-    let isDraggingPhotoGlobal = false;
+    // ========= 全局触摸滑动切换月份（与拖拽标志严格互斥） =========
     function onGlobalTouchStart(e) {
         if (zoomOverlay.style.display === 'flex') return;
-        if (e.target.closest('.scatter-photo')) {
-            isDraggingPhotoGlobal = true;
-            return;
-        }
-        touchStartGlobal = e.changedTouches[0].screenX;
+        // 如果触摸点起始在照片上，拖拽标志会在照片的onPointerDown中设为true，月份滑动会被阻挡；
+        // 但为了防止干扰，同时记录起始X用于滑动判定，但滑动只在未激活拖拽标志时生效。
+        touchStartGlobalX = e.changedTouches[0].screenX;
     }
+    
     function onGlobalTouchEnd(e) {
         if (zoomOverlay.style.display === 'flex') return;
-        if (isDraggingPhotoGlobal) {
-            isDraggingPhotoGlobal = false;
+        // 核心修复: 如果当前正处于照片拖拽交互中（包括未移动但触摸在照片上），
+        // 一律禁止月份滑动，并重置标志（防止残留）。
+        if (draggingPhotoActive) {
+            // 注意：拖拽结束时的setTimeout会在之后重置标志，这里不做额外重置避免冲突
             return;
         }
-        const delta = e.changedTouches[0].screenX - touchStartGlobal;
+        const delta = e.changedTouches[0].screenX - touchStartGlobalX;
         if (Math.abs(delta) > minSwipeDistance) {
             if (delta > 0) prevMonth();
             else nextMonth();
         }
-        touchStartGlobal = 0;
+        touchStartGlobalX = 0;
     }
+    
     document.body.addEventListener('touchstart', onGlobalTouchStart, { passive: false });
     document.body.addEventListener('touchend', onGlobalTouchEnd);
+    
+    // 键盘左右箭头支持
     document.addEventListener('keydown', (e) => {
         if (zoomOverlay.style.display === 'flex') {
             if (e.key === 'Escape') closeZoom();
@@ -755,10 +769,11 @@
         if (e.key === 'ArrowLeft') { e.preventDefault(); prevMonth(); }
         if (e.key === 'ArrowRight') { e.preventDefault(); nextMonth(); }
     });
+    
     closeZoomBtn.addEventListener('click', closeZoom);
     zoomOverlay.addEventListener('click', (e) => { if (e.target === zoomOverlay) closeZoom(); });
 
-    // 初始化
+    // 启动
     renderNav();
     setActiveMonth(0);
 </script>
